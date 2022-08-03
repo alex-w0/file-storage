@@ -1,0 +1,20 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type StorageFile {
+  name: String!
+}
+
+type Query {
+  files: [StorageFile!]!
+  file(id: String!): StorageFile!
+}
+
+type Mutation {
+  uploadFile(data: UploadStorageFileInput!): StorageFile!
+}
+
+input UploadStorageFileInput {
+  name: String!
+}
