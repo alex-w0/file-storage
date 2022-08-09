@@ -3,5 +3,14 @@ import { Field, ObjectType } from '@nestjs/graphql';
 @ObjectType()
 export class StorageFile {
   @Field()
-  name: string;
+  uuid: string;
+
+  @Field()
+  storageKey: string;
+
+  @Field()
+  createdAt: Date;
+
+  @Field()
+  updatedAt: Date;
 }
