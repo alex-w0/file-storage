@@ -1,7 +1,7 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { S3Client } from '@aws-sdk/client-s3';
 import { ConfigService } from '@nestjs/config';
-import { RedisClientService } from 'src/shared/redis-client/redis-client.service';
+import { RedisClientService } from 'src/shared/services/redis-client/redis-client.service';
 
 @Injectable()
 export class AWSClientService {

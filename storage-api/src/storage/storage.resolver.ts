@@ -1,10 +1,13 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { UploadStorageFileInput } from './dto/new-storage-file.input';
+import {
+  BucketNameArgs,
+  UploadStorageFileInput,
+} from './dto/new-storage-file.input';
 import { StorageFile } from './models/storage-file.model';
 
 import { ListObjectsV2Command } from '@aws-sdk/client-s3';
 import { AWSClientService } from 'src/shared/services/aws-client/aws-client.service';
-import { RedisClientService } from 'src/shared/redis-client/redis-client.service';
+import { RedisClientService } from 'src/shared/services/redis-client/redis-client.service';
 
 @Resolver(() => StorageFile)
 export class StorageResolver {
@@ -14,11 +17,11 @@ export class StorageResolver {
   ) {}
 
   @Query(() => [StorageFile])
-  async files(): Promise<StorageFile[]> {
-    const bucketName = 'oekotex';
+  async files(
+    @Args('bucketNameArguments') { bucketName }: BucketNameArgs,
+  ): Promise<StorageFile[]> {
     const command = new ListObjectsV2Command({
-      Bucket: 'oekotex',
-      // Prefix:
+      Bucket: bucketName,
     });
 
     const response = await this.awsClientService.s3Client.send(command);
@@ -36,7 +39,10 @@ export class StorageResolver {
   }
 
   @Query(() => StorageFile)
-  file(@Args('id') id: string): StorageFile {
+  file(
+    @Args('bucketNameArguments') { bucketName }: BucketNameArgs,
+    @Args('id') id: string,
+  ): StorageFile {
     return {
       uuid: '123',
       storageKey: 'File 1',
@@ -47,9 +53,10 @@ export class StorageResolver {
 
   @Mutation(() => StorageFile)
   async uploadFile(
+    @Args('bucketNameArguments') { bucketName }: BucketNameArgs,
     @Args('data') uploadStorageFileData: UploadStorageFileInput,
   ) {
-    await this.awsClientService.uploadS3File('oekotex');
+    await this.awsClientService.uploadS3File(bucketName);
     // const response = await this.awsClientService.s3Client.send(command);
 
     return {

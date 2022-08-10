@@ -15,12 +15,16 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 scalar DateTime
 
 type Query {
-  files: [StorageFile!]!
-  file(id: String!): StorageFile!
+  files(bucketNameArguments: BucketNameArgs!): [StorageFile!]!
+  file(bucketNameArguments: BucketNameArgs!, id: String!): StorageFile!
+}
+
+input BucketNameArgs {
+  bucketName: String!
 }
 
 type Mutation {
-  uploadFile(data: UploadStorageFileInput!): StorageFile!
+  uploadFile(bucketNameArguments: BucketNameArgs!, data: UploadStorageFileInput!): StorageFile!
 }
 
 input UploadStorageFileInput {

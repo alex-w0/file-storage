@@ -41,6 +41,10 @@ export class RedisClientService {
 
     console.log('Response', response);
   }
+
+  async checkIfBucketExist(bucketName: string): Promise<boolean> {
+    return this.#client.sIsMember('validBucketNames', bucketName);
+  }
 }
 
 /** File Structure
@@ -49,7 +53,11 @@ export class RedisClientService {
  * {bucketName}:s3:152327
  */
 
-/** File Structure
- * {bucketName}:level:root
- * {bucketName}:level:152326 -> lists all members from this directory, which can contain s3 files but also folders
+/** Directory Structure
+ * {bucketName}:directory:root
+ * {bucketName}:directory:152326 -> lists all members from this directory, which can contain s3 files but also folders
+ */
+
+/** Valid bucket names
+ * validBucketNames -> contains the names of valid buckets that were created on AWS S3
  */
