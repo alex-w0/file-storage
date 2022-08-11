@@ -2,6 +2,11 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createClient, RedisClientType } from 'redis';
 import { randomUUID } from 'crypto';
+import { StorageFile } from 'src/storage/models/storage-file.model';
+import {
+  CustomTypeToRedisJSON,
+  RedisJSONToCustomType,
+} from 'src/shared/utils/json-converter';
 
 @Injectable()
 export class RedisClientService {
@@ -32,17 +37,29 @@ export class RedisClientService {
     console.log(value);
   }
 
-  async storeS3File(bucketName: string): Promise<void> {
-    const s3RedisKey = `${bucketName}:s3:${randomUUID()}`;
+  async getFile(bucketName: string, uuid: string): Promise<StorageFile> {
+    const response = await this.#client.json.get(`${bucketName}:s3:${uuid}`);
 
-    await this.#client.set(s3RedisKey, 'value44414');
+    return RedisJSONToCustomType(response);
+  }
 
-    const response = await this.#client.get(s3RedisKey);
+  async storeFile(bucketName: string): Promise<StorageFile> {
+    const s3File: StorageFile = {
+      uuid: randomUUID(),
+      s3ObjectKey: 's3/234',
+      createdAt: new Date(),
+      updatedAt: null,
+    };
 
-    console.log('Response', response);
+    const s3RedisKey = `${bucketName}:s3:${s3File.uuid}`;
+
+    await this.#client.json.set(s3RedisKey, '$', CustomTypeToRedisJSON(s3File));
+
+    return this.getFile(bucketName, s3File.uuid);
   }
 
   async checkIfBucketExist(bucketName: string): Promise<boolean> {
+    // Command to create a new member: SADD "validBucketNames" "one"
     return this.#client.sIsMember('validBucketNames', bucketName);
   }
 }

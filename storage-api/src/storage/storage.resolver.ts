@@ -31,7 +31,7 @@ export class StorageResolver {
     return response.Contents.map((s3Object) => {
       return {
         uuid: '123',
-        storageKey: s3Object.Key,
+        s3ObjectKey: s3Object.Key,
         createdAt: s3Object.LastModified,
         updatedAt: s3Object.LastModified,
       };
@@ -39,16 +39,11 @@ export class StorageResolver {
   }
 
   @Query(() => StorageFile)
-  file(
+  async file(
     @Args('bucketNameArguments') { bucketName }: BucketNameArgs,
     @Args('id') id: string,
-  ): StorageFile {
-    return {
-      uuid: '123',
-      storageKey: 'File 1',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+  ): Promise<StorageFile> {
+    return this.redisClientService.getFile(bucketName, id);
   }
 
   @Mutation(() => StorageFile)
@@ -56,11 +51,6 @@ export class StorageResolver {
     @Args('bucketNameArguments') { bucketName }: BucketNameArgs,
     @Args('data') uploadStorageFileData: UploadStorageFileInput,
   ) {
-    await this.awsClientService.uploadS3File(bucketName);
-    // const response = await this.awsClientService.s3Client.send(command);
-
-    return {
-      name: 'File 1',
-    };
+    return this.awsClientService.uploadS3File(bucketName);
   }
 }

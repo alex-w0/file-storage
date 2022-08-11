@@ -6,11 +6,11 @@ export class StorageFile {
   uuid: string;
 
   @Field()
-  storageKey: string;
+  s3ObjectKey: string;
 
   @Field()
   createdAt: Date;
 
-  @Field()
-  updatedAt: Date;
+  @Field({ nullable: true })
+  updatedAt?: Date;
 }

@@ -4,9 +4,9 @@
 
 type StorageFile {
   uuid: String!
-  storageKey: String!
+  s3ObjectKey: String!
   createdAt: DateTime!
-  updatedAt: DateTime!
+  updatedAt: DateTime
 }
 
 """

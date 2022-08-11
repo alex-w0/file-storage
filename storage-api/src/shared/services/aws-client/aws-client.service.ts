@@ -2,6 +2,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { S3Client } from '@aws-sdk/client-s3';
 import { ConfigService } from '@nestjs/config';
 import { RedisClientService } from 'src/shared/services/redis-client/redis-client.service';
+import { StorageFile } from 'src/storage/models/storage-file.model';
 
 @Injectable()
 export class AWSClientService {
@@ -33,7 +34,7 @@ export class AWSClientService {
     return this.#client;
   }
 
-  async uploadS3File(bucketName: string): Promise<void> {
-    await this.redisClient.storeS3File(bucketName);
+  async uploadS3File(bucketName: string): Promise<StorageFile> {
+    return this.redisClient.storeFile(bucketName);
   }
 }
