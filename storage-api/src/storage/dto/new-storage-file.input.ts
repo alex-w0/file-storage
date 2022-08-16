@@ -14,3 +14,9 @@ export class BucketNameArgs {
   @Field()
   bucketName: string;
 }
+
+@InputType()
+export class CreateBucketArgs {
+  @Field()
+  bucketName: string;
+}

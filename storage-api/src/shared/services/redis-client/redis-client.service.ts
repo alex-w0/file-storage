@@ -58,8 +58,17 @@ export class RedisClientService {
     return this.getFile(bucketName, s3File.uuid);
   }
 
+  async createBucket(bucketName: string): Promise<boolean> {
+    // Redis command: SADD "validBucketNames" "one"
+    const bucketPositionIndex = await this.#client.sAdd(
+      'validBucketNames',
+      bucketName,
+    );
+
+    return bucketPositionIndex >= 0;
+  }
+
   async checkIfBucketExist(bucketName: string): Promise<boolean> {
-    // Command to create a new member: SADD "validBucketNames" "one"
     return this.#client.sIsMember('validBucketNames', bucketName);
   }
 }

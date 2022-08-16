@@ -1,6 +1,7 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import {
   BucketNameArgs,
+  CreateBucketArgs,
   UploadStorageFileInput,
 } from './dto/new-storage-file.input';
 import { StorageFile } from './models/storage-file.model';
@@ -52,5 +53,12 @@ export class StorageResolver {
     @Args('data') uploadStorageFileData: UploadStorageFileInput,
   ) {
     return this.awsClientService.uploadS3File(bucketName);
+  }
+
+  @Mutation(() => Boolean)
+  async createBucket(
+    @Args('createBucketArguments') { bucketName }: CreateBucketArgs,
+  ) {
+    return this.awsClientService.createS3Bucket(bucketName);
   }
 }

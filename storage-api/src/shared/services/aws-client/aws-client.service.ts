@@ -1,5 +1,9 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { S3Client } from '@aws-sdk/client-s3';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
+import { CreateBucketCommand, S3Client } from '@aws-sdk/client-s3';
 import { ConfigService } from '@nestjs/config';
 import { RedisClientService } from 'src/shared/services/redis-client/redis-client.service';
 import { StorageFile } from 'src/storage/models/storage-file.model';
@@ -36,5 +40,39 @@ export class AWSClientService {
 
   async uploadS3File(bucketName: string): Promise<StorageFile> {
     return this.redisClient.storeFile(bucketName);
+  }
+
+  async createS3Bucket(bucketName: string): Promise<boolean> {
+    const bucketNameExists = await this.redisClient.checkIfBucketExist(
+      bucketName,
+    );
+
+    if (bucketNameExists === true) {
+      throw new BadRequestException(
+        `Bucket name ${bucketName} already exists!`,
+      );
+    }
+
+    const command = new CreateBucketCommand({
+      Bucket: bucketName,
+    });
+
+    const createBucketResponse = await this.#client.send(command);
+
+    if (createBucketResponse.$metadata.httpStatusCode !== 200) {
+      throw new InternalServerErrorException(
+        `Bucket ${bucketName} could not be created on AWS!`,
+      );
+    }
+
+    const bucketIsCreated = await this.redisClient.createBucket(bucketName);
+
+    if (bucketIsCreated === false) {
+      throw new InternalServerErrorException(
+        `Bucket name ${bucketName} could not be created!`,
+      );
+    }
+
+    return bucketIsCreated;
   }
 }

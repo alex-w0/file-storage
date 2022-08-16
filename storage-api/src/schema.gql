@@ -25,8 +25,13 @@ input BucketNameArgs {
 
 type Mutation {
   uploadFile(bucketNameArguments: BucketNameArgs!, data: UploadStorageFileInput!): StorageFile!
+  createBucket(createBucketArguments: CreateBucketArgs!): Boolean!
 }
 
 input UploadStorageFileInput {
   name: String!
+}
+
+input CreateBucketArgs {
+  bucketName: String!
 }
