@@ -52,7 +52,10 @@ export class StorageResolver {
     @Args('bucketNameArguments') { bucketName }: BucketNameArgs,
     @Args('data') uploadStorageFileData: UploadStorageFileInput,
   ) {
-    return this.awsClientService.uploadS3File(bucketName);
+    return this.awsClientService.uploadS3File(
+      bucketName,
+      uploadStorageFileData,
+    );
   }
 
   @Mutation(() => Boolean)
