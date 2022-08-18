@@ -10,24 +10,13 @@ import {
   CreateMultipartUploadCommand,
   S3Client,
   UploadPartCommand,
+  UploadPartCommandOutput,
 } from '@aws-sdk/client-s3';
 import { ConfigService } from '@nestjs/config';
 import { RedisClientService } from 'src/shared/services/redis-client/redis-client.service';
 import { StorageFile } from 'src/storage/models/storage-file.model';
-import { readFileSync } from 'fs';
 import { UploadStorageFileInput } from 'src/storage/dto/new-storage-file.input';
-import { Stream } from 'stream';
-
-async function stream2buffer(stream: Stream): Promise<Buffer> {
-  return new Promise<Buffer>((resolve, reject) => {
-    const _buf = Array<any>();
-
-    stream.on('data', (chunk) => _buf.push(chunk));
-    stream.on('end', () => resolve(Buffer.concat(_buf)));
-    stream.on('error', (err) => reject(`error converting stream - ${err}`));
-  });
-}
-
+import { streamToBuffer } from 'src/shared/utils/stream-to-buffer';
 @Injectable()
 export class AWSClientService {
   #client: S3Client;
@@ -63,15 +52,12 @@ export class AWSClientService {
     fileData: UploadStorageFileInput,
   ): Promise<StorageFile> {
     const { createReadStream, filename } = await fileData.file;
-    console.log('FileData filename', filename);
 
-    const fStream = await stream2buffer(createReadStream());
+    const fStream = await streamToBuffer(createReadStream());
 
-    // createReadStream().on('data', (chunk) => {
-    //   console.log(chunk);
-    // });
-
-    // const fStream = readFileSync('./angular-electron.zip');
+    console.info(
+      `File upload for file ${filename} (size: ${fStream.length}) is starting...`,
+    );
 
     const createMultipartCommand = new CreateMultipartUploadCommand({
       Bucket: bucketName,
@@ -88,12 +74,13 @@ export class AWSClientService {
       );
     }
 
-    const completedUploadParts: CompletedPart[] = [];
     // AWS requirement: each part must be at least 5 MB in size, except the last part.
-    // We are using 10mb for each chunk
-    const partSize = 1024 * 1024 * 10;
+    // We are using 20mb for each chunk
+    const partSize = 1024 * 1024 * 20;
 
     let partNum = 0;
+
+    const uploadPartCommandRequests: Promise<UploadPartCommandOutput>[] = [];
     // Grab each partSize chunk and upload it as a part
     for (
       let rangeStart = 0;
@@ -113,27 +100,36 @@ export class AWSClientService {
       });
 
       // Send a single part
-      console.log(
+      console.info(
         'Uploading part: #',
         uploadPartCommand.input.PartNumber,
         ', Range start:',
         rangeStart,
       );
 
-      const uploadPartResponse = await this.#client.send(uploadPartCommand);
-
-      if (uploadPartResponse.$metadata.httpStatusCode !== 200) {
-        throw new InternalServerErrorException(
-          `AWS S3 upload part was not successful!`,
-        );
-      }
-
-      completedUploadParts.push({
-        PartNumber: partNum,
-        ETag: uploadPartResponse.ETag,
-      });
+      uploadPartCommandRequests.push(this.#client.send(uploadPartCommand));
     }
-    console.log('Upload Parts complete');
+
+    const uploadPartCommandResponses = await Promise.all(
+      uploadPartCommandRequests,
+    );
+
+    const completedUploadParts: CompletedPart[] =
+      uploadPartCommandResponses.map(
+        // Luckily promise.all preserves the order of the input and output, so the (partNumberIndex + 1) will be equal the partial upload number.
+        (uploadPartCommandResponse, partNumberIndex) => {
+          if (uploadPartCommandResponse.$metadata.httpStatusCode !== 200) {
+            throw new InternalServerErrorException(
+              `AWS S3 upload part was not successful!`,
+            );
+          }
+
+          return {
+            PartNumber: partNumberIndex + 1,
+            ETag: uploadPartCommandResponse.ETag,
+          };
+        },
+      );
 
     const completeMultipartCommand = new CompleteMultipartUploadCommand({
       Bucket: createMultipartCommand.input.Bucket,
@@ -154,9 +150,15 @@ export class AWSClientService {
       );
     }
 
-    console.log('Upload complete');
+    console.info(`File upload for file ${filename} completed...`);
+    console.log(completeMultipartResponse);
 
-    return this.redisClient.storeFile(bucketName);
+    return this.redisClient.storeFile({
+      bucketName,
+      s3ObjectKey: completeMultipartResponse.Key,
+      eTag: completeMultipartResponse.ETag,
+      location: completeMultipartResponse.Location,
+    });
   }
 
   async createS3Bucket(bucketName: string): Promise<boolean> {

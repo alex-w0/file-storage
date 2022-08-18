@@ -7,6 +7,7 @@ import {
   CustomTypeToRedisJSON,
   RedisJSONToCustomType,
 } from 'src/shared/utils/json-converter';
+import { StoreFileArguments } from 'src/shared/models/redis-client.model';
 
 @Injectable()
 export class RedisClientService {
@@ -43,10 +44,17 @@ export class RedisClientService {
     return RedisJSONToCustomType(response);
   }
 
-  async storeFile(bucketName: string): Promise<StorageFile> {
+  async storeFile({
+    bucketName,
+    s3ObjectKey,
+    eTag,
+    location,
+  }: StoreFileArguments): Promise<StorageFile> {
     const s3File: StorageFile = {
       uuid: randomUUID(),
-      s3ObjectKey: 's3/234',
+      s3ObjectKey,
+      eTag,
+      location,
       createdAt: new Date(),
       updatedAt: null,
     };

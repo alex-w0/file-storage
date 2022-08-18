@@ -9,6 +9,12 @@ export class StorageFile {
   s3ObjectKey: string;
 
   @Field()
+  eTag: string;
+
+  @Field()
+  location: string;
+
+  @Field()
   createdAt: Date;
 
   @Field({ nullable: true })

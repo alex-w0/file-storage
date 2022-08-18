@@ -5,6 +5,8 @@
 type StorageFile {
   uuid: String!
   s3ObjectKey: String!
+  eTag: String!
+  location: String!
   createdAt: DateTime!
   updatedAt: DateTime
 }

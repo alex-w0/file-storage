@@ -8,6 +8,7 @@ export class UploadStorageFileInput {
   @Field()
   name: string;
 
+  // TODO: Write validator that checks if the file does not reach the max file size
   @Field(() => GraphQLUpload)
   file: Promise<FileUpload>;
 }

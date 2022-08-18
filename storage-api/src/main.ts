@@ -11,8 +11,9 @@ async function bootstrap() {
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
   app.use(
     graphqlUploadExpress({
-      maxFileSize: 10000000, // 10 MB
-      maxFiles: 10,
+      // 1 GB max file size
+      maxFileSize: 1024 * 1024 * 1000,
+      maxFiles: 1,
     }),
   );
 

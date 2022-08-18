@@ -32,6 +32,8 @@ export class StorageResolver {
     return response.Contents.map((s3Object) => {
       return {
         uuid: '123',
+        location: 'test',
+        eTag: '123',
         s3ObjectKey: s3Object.Key,
         createdAt: s3Object.LastModified,
         updatedAt: s3Object.LastModified,
