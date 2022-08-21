@@ -38,10 +38,16 @@ export class RedisClientService {
     console.log(value);
   }
 
-  async getFile(bucketName: string, uuid: string): Promise<StorageFile> {
+  async getFile(bucketName: string, uuid: string): Promise<StorageFile | null> {
     const response = await this.#client.json.get(`${bucketName}:s3:${uuid}`);
 
     return RedisJSONToCustomType(response);
+  }
+
+  async deleteFile(bucketName: string, uuid: string): Promise<boolean> {
+    const keysDeleted = await this.#client.del(`${bucketName}:s3:${uuid}`);
+
+    return keysDeleted >= 1;
   }
 
   async storeFile({

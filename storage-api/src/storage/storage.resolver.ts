@@ -44,9 +44,9 @@ export class StorageResolver {
   @Query(() => StorageFile)
   async file(
     @Args('bucketNameArguments') { bucketName }: BucketNameArgs,
-    @Args('id') id: string,
+    @Args('uuid') uuid: string,
   ): Promise<StorageFile> {
-    return this.redisClientService.getFile(bucketName, id);
+    return this.redisClientService.getFile(bucketName, uuid);
   }
 
   @Mutation(() => StorageFile)
@@ -58,6 +58,14 @@ export class StorageResolver {
       bucketName,
       uploadStorageFileData,
     );
+  }
+
+  @Mutation(() => StorageFile)
+  async deleteFile(
+    @Args('bucketNameArguments') { bucketName }: BucketNameArgs,
+    @Args('uuid') uuid: string,
+  ) {
+    return this.awsClientService.deleteS3File(bucketName, uuid);
   }
 
   @Mutation(() => Boolean)

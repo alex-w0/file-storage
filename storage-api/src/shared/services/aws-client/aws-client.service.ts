@@ -2,12 +2,14 @@ import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import {
   CompletedPart,
   CompleteMultipartUploadCommand,
   CreateBucketCommand,
   CreateMultipartUploadCommand,
+  DeleteObjectCommand,
   S3Client,
   UploadPartCommand,
   UploadPartCommandOutput,
@@ -17,6 +19,7 @@ import { RedisClientService } from 'src/shared/services/redis-client/redis-clien
 import { StorageFile } from 'src/storage/models/storage-file.model';
 import { UploadStorageFileInput } from 'src/storage/dto/new-storage-file.input';
 import { streamToBuffer } from 'src/shared/utils/stream-to-buffer';
+import { NotFoundError } from 'rxjs';
 @Injectable()
 export class AWSClientService {
   #client: S3Client;
@@ -159,6 +162,41 @@ export class AWSClientService {
       eTag: completeMultipartResponse.ETag,
       location: completeMultipartResponse.Location,
     });
+  }
+
+  async deleteS3File(bucketName: string, uuid: string): Promise<StorageFile> {
+    const file = await this.redisClient.getFile(bucketName, uuid);
+
+    if (file === null) {
+      throw new NotFoundException('File does not exists!');
+    }
+
+    const deleteObjectCommand = new DeleteObjectCommand({
+      Bucket: bucketName,
+      Key: file.s3ObjectKey,
+    });
+
+    const deleteObjectCommandResponse = await this.#client.send(
+      deleteObjectCommand,
+    );
+
+    console.log(file);
+    console.log(deleteObjectCommandResponse);
+    if (deleteObjectCommandResponse.$metadata.httpStatusCode !== 204) {
+      throw new InternalServerErrorException(
+        `AWS S3 deleting the object ${uuid} failed!`,
+      );
+    }
+
+    const fileRemoved = await this.redisClient.deleteFile(bucketName, uuid);
+
+    if (fileRemoved === false) {
+      throw new InternalServerErrorException(
+        `File ${uuid} could not be removed on the bucket ${bucketName}!`,
+      );
+    }
+
+    return file;
   }
 
   async createS3Bucket(bucketName: string): Promise<boolean> {
