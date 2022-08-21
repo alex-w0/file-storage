@@ -68,6 +68,7 @@ export class RedisClientService {
     const s3RedisKey = `${bucketName}:s3:${s3File.uuid}`;
 
     await this.#client.json.set(s3RedisKey, '$', CustomTypeToRedisJSON(s3File));
+    await this.#client.sAdd(`${bucketName}:s3Keys`, s3File.s3ObjectKey);
 
     return this.getFile(bucketName, s3File.uuid);
   }
@@ -80,6 +81,13 @@ export class RedisClientService {
     );
 
     return bucketPositionIndex >= 0;
+  }
+
+  async checkIfFileKeyExist(
+    bucketName: string,
+    s3ObjectKey: string,
+  ): Promise<boolean> {
+    return this.#client.sIsMember(`${bucketName}:s3Keys`, s3ObjectKey);
   }
 
   async checkIfBucketExist(bucketName: string): Promise<boolean> {

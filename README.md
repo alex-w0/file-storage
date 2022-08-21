@@ -1,9 +1,12 @@
 # File storage
 
+## Redis client key structure
+`validBucketNames` -> Contains the information about all existing buckets on AWS
+`{bucketName}:s3:{uuid}` -> Contains the information about a specific file object on AWS
+`{bucketName}:s3Keys` -> A list about all existing s3 keys 
 
 ## Tools
 Redis client: https://resp.app/
-
 
 ## Postman File upload example
 

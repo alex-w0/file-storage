@@ -56,6 +56,17 @@ export class AWSClientService {
   ): Promise<StorageFile> {
     const { createReadStream, filename } = await fileData.file;
 
+    const fileExists = await this.redisClient.checkIfFileKeyExist(
+      bucketName,
+      filename,
+    );
+
+    if (fileExists === true) {
+      throw new BadRequestException(
+        `A file already exists with the filename ${filename}!`,
+      );
+    }
+
     const fStream = await streamToBuffer(createReadStream());
 
     console.info(
