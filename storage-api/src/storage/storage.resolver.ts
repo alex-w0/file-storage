@@ -21,24 +21,9 @@ export class StorageResolver {
   async files(
     @Args('bucketNameArguments') { bucketName }: BucketNameArgs,
   ): Promise<StorageFile[]> {
-    const command = new ListObjectsV2Command({
-      Bucket: bucketName,
-    });
+    const files = await this.redisClientService.getFiles(bucketName);
 
-    const response = await this.awsClientService.s3Client.send(command);
-
-    await this.redisClientService.getFiles(bucketName);
-
-    return response.Contents.map((s3Object) => {
-      return {
-        uuid: '123',
-        location: 'test',
-        eTag: '123',
-        s3ObjectKey: s3Object.Key,
-        createdAt: s3Object.LastModified,
-        updatedAt: s3Object.LastModified,
-      };
-    });
+    return files;
   }
 
   @Query(() => StorageFile)

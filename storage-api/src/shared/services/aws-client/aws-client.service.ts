@@ -19,7 +19,7 @@ import { RedisClientService } from 'src/shared/services/redis-client/redis-clien
 import { StorageFile } from 'src/storage/models/storage-file.model';
 import { UploadStorageFileInput } from 'src/storage/dto/new-storage-file.input';
 import { streamToBuffer } from 'src/shared/utils/stream-to-buffer';
-import { NotFoundError } from 'rxjs';
+
 @Injectable()
 export class AWSClientService {
   #client: S3Client;

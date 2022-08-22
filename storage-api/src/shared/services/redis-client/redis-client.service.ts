@@ -31,17 +31,30 @@ export class RedisClientService {
     })();
   }
 
-  async getFiles(bucketName: string) {
-    // client.sAdd('users:1:tokens', 'Tm9kZSBSZWRpcw==');
-    await this.#client.set('key', 'value');
-    const value = await this.#client.get('key');
-    console.log(value);
+  #parseRedisJSONToStorageFile(data: any): StorageFile {
+    return {
+      ...data,
+      createdAt: new Date(data.createdAt),
+      updatedAt: data.updatedAt ? new Date(data.updatedAt) : undefined,
+    };
+  }
+
+  async getFiles(bucketName: string): Promise<StorageFile[]> {
+    // Redis command: json.get {bucketName}:s3:{uuid} '.'
+    const { cursor, keys } = await this.#client.scan(0, {
+      COUNT: 1000,
+      MATCH: `${bucketName}:s3:*`,
+    });
+
+    const response = await this.#client.json.mGet(keys, '.');
+
+    return response.map(this.#parseRedisJSONToStorageFile);
   }
 
   async getFile(bucketName: string, uuid: string): Promise<StorageFile | null> {
     const response = await this.#client.json.get(`${bucketName}:s3:${uuid}`);
 
-    return RedisJSONToCustomType(response);
+    return this.#parseRedisJSONToStorageFile(response);
   }
 
   async deleteFile(bucketName: string, uuid: string): Promise<boolean> {
