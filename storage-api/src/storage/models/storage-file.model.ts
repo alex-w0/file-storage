@@ -1,22 +1,10 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { createUnionType } from '@nestjs/graphql';
+import { StorageDirectory } from './storage-directory.model';
+import { StorageImage } from './storage-image.model';
 
-@ObjectType()
-export class StorageFile {
-  @Field()
-  uuid: string;
+export const StorageFileUnion = createUnionType({
+  name: 'StorageFile',
+  types: () => [StorageDirectory, StorageImage] as const,
+});
 
-  @Field()
-  s3ObjectKey: string;
-
-  @Field()
-  eTag: string;
-
-  @Field()
-  location: string;
-
-  @Field()
-  createdAt: Date;
-
-  @Field({ nullable: true })
-  updatedAt?: Date;
-}
+export type StorageFile = typeof StorageFileUnion;

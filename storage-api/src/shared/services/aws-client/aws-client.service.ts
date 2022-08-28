@@ -10,15 +10,22 @@ import {
   CreateBucketCommand,
   CreateMultipartUploadCommand,
   DeleteObjectCommand,
+  PutObjectCommand,
   S3Client,
   UploadPartCommand,
   UploadPartCommandOutput,
 } from '@aws-sdk/client-s3';
 import { ConfigService } from '@nestjs/config';
 import { RedisClientService } from 'src/shared/services/redis-client/redis-client.service';
-import { StorageFile } from 'src/storage/models/storage-file.model';
-import { UploadStorageFileInput } from 'src/storage/dto/new-storage-file.input';
+import { StorageImage } from 'src/storage/models/storage-image.model';
+import {
+  CreateDirectoryInput,
+  UploadStorageFileInput,
+} from 'src/storage/dto/new-storage-file.input';
 import { streamToBuffer } from 'src/shared/utils/stream-to-buffer';
+import { StorageFile } from 'src/storage/models/storage-file.model';
+import { StorageDirectory } from 'src/storage/models/storage-directory.model';
+import { StorageFileType } from 'src/shared/enums/storage-file-type';
 
 @Injectable()
 export class AWSClientService {
@@ -53,7 +60,7 @@ export class AWSClientService {
   async uploadS3File(
     bucketName: string,
     fileData: UploadStorageFileInput,
-  ): Promise<StorageFile> {
+  ): Promise<StorageImage> {
     const { createReadStream, filename } = await fileData.file;
 
     const fileExists = await this.redisClient.checkIfFileKeyExist(
@@ -167,12 +174,49 @@ export class AWSClientService {
     console.info(`File upload for file ${filename} completed...`);
     console.log(completeMultipartResponse);
 
-    return this.redisClient.storeFile({
-      bucketName,
+    return this.redisClient.storeFile(bucketName, {
+      storageType: StorageFileType.Image,
       s3ObjectKey: completeMultipartResponse.Key,
       eTag: completeMultipartResponse.ETag,
-      location: completeMultipartResponse.Location,
+      url: completeMultipartResponse.Location,
+      metaData: {},
     });
+  }
+
+  async createS3Directory(
+    bucketName: string,
+    { name }: CreateDirectoryInput,
+  ): Promise<StorageDirectory> {
+    // const file = await this.redisClient.getFile(bucketName, uuid);
+
+    // if (file === null) {
+    //   throw new NotFoundException('File does not exists!');
+    // }
+
+    const putObjectCommand = new PutObjectCommand({
+      Bucket: bucketName,
+      Key: name,
+    });
+
+    const putObjectCommandResponse = await this.#client.send(putObjectCommand);
+
+    if (putObjectCommandResponse.$metadata.httpStatusCode !== 200) {
+      throw new InternalServerErrorException(
+        `AWS S3 creating directory ${name} failed!`,
+      );
+    }
+
+    console.log(putObjectCommandResponse);
+
+    // const fileRemoved = await this.redisClient.storeFile(bucketName, uuid);
+
+    // if (fileRemoved === false) {
+    //   throw new InternalServerErrorException(
+    //     `File ${uuid} could not be removed on the bucket ${bucketName}!`,
+    //   );
+    // }
+
+    return {} as any;
   }
 
   async deleteS3File(bucketName: string, uuid: string): Promise<StorageFile> {
@@ -191,8 +235,6 @@ export class AWSClientService {
       deleteObjectCommand,
     );
 
-    console.log(file);
-    console.log(deleteObjectCommandResponse);
     if (deleteObjectCommandResponse.$metadata.httpStatusCode !== 204) {
       throw new InternalServerErrorException(
         `AWS S3 deleting the object ${uuid} failed!`,

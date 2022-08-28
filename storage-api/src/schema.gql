@@ -2,13 +2,19 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type StorageFile {
+type StorageImageMetaData {
+  titleTag: String
+  altTag: String
+}
+
+type StorageImage {
   uuid: String!
   s3ObjectKey: String!
   eTag: String!
-  location: String!
   createdAt: DateTime!
   updatedAt: DateTime
+  url: String!
+  metaData: StorageImageMetaData!
 }
 
 """
@@ -16,17 +22,33 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type StorageDirectoryMetaData {
+  name: String!
+}
+
+type StorageDirectory {
+  uuid: String!
+  s3ObjectKey: String!
+  eTag: String!
+  createdAt: DateTime!
+  updatedAt: DateTime
+  metaData: StorageDirectoryMetaData!
+}
+
 type Query {
   files(bucketNameArguments: BucketNameArgs!): [StorageFile!]!
   file(bucketNameArguments: BucketNameArgs!, uuid: String!): StorageFile!
 }
+
+union StorageFile = StorageDirectory | StorageImage
 
 input BucketNameArgs {
   bucketName: String!
 }
 
 type Mutation {
-  uploadFile(bucketNameArguments: BucketNameArgs!, data: UploadStorageFileInput!): StorageFile!
+  uploadFile(bucketNameArguments: BucketNameArgs!, data: UploadStorageFileInput!): StorageImage!
+  createDirectory(bucketNameArguments: BucketNameArgs!, data: CreateDirectoryInput!): StorageDirectory!
   deleteFile(bucketNameArguments: BucketNameArgs!, uuid: String!): StorageFile!
   createBucket(createBucketArguments: CreateBucketArgs!): Boolean!
 }
@@ -38,6 +60,10 @@ input UploadStorageFileInput {
 
 """The `Upload` scalar type represents a file upload."""
 scalar Upload
+
+input CreateDirectoryInput {
+  name: String!
+}
 
 input CreateBucketArgs {
   bucketName: String!

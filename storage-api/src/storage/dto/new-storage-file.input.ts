@@ -14,6 +14,12 @@ export class UploadStorageFileInput {
 }
 
 @InputType()
+export class CreateDirectoryInput {
+  @Field()
+  name: string;
+}
+
+@InputType()
 export class BucketNameArgs {
   @Validate(BucketExistsRule)
   @Field()

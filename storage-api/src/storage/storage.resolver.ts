@@ -2,22 +2,24 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import {
   BucketNameArgs,
   CreateBucketArgs,
+  CreateDirectoryInput,
   UploadStorageFileInput,
 } from './dto/new-storage-file.input';
-import { StorageFile } from './models/storage-file.model';
+import { StorageImage } from './models/storage-image.model';
 
-import { ListObjectsV2Command } from '@aws-sdk/client-s3';
 import { AWSClientService } from 'src/shared/services/aws-client/aws-client.service';
 import { RedisClientService } from 'src/shared/services/redis-client/redis-client.service';
+import { StorageFile, StorageFileUnion } from './models/storage-file.model';
+import { StorageDirectory } from './models/storage-directory.model';
 
-@Resolver(() => StorageFile)
+@Resolver(() => StorageImage)
 export class StorageResolver {
   constructor(
     private awsClientService: AWSClientService,
     private redisClientService: RedisClientService,
   ) {}
 
-  @Query(() => [StorageFile])
+  @Query(() => [StorageFileUnion])
   async files(
     @Args('bucketNameArguments') { bucketName }: BucketNameArgs,
   ): Promise<StorageFile[]> {
@@ -26,7 +28,7 @@ export class StorageResolver {
     return files;
   }
 
-  @Query(() => StorageFile)
+  @Query(() => StorageFileUnion)
   async file(
     @Args('bucketNameArguments') { bucketName }: BucketNameArgs,
     @Args('uuid') uuid: string,
@@ -34,7 +36,7 @@ export class StorageResolver {
     return this.redisClientService.getFile(bucketName, uuid);
   }
 
-  @Mutation(() => StorageFile)
+  @Mutation(() => StorageImage)
   async uploadFile(
     @Args('bucketNameArguments') { bucketName }: BucketNameArgs,
     @Args('data') uploadStorageFileData: UploadStorageFileInput,
@@ -45,7 +47,18 @@ export class StorageResolver {
     );
   }
 
-  @Mutation(() => StorageFile)
+  @Mutation(() => StorageDirectory)
+  async createDirectory(
+    @Args('bucketNameArguments') { bucketName }: BucketNameArgs,
+    @Args('data') createDirectoryData: CreateDirectoryInput,
+  ) {
+    return this.awsClientService.createS3Directory(
+      bucketName,
+      createDirectoryData,
+    );
+  }
+
+  @Mutation(() => StorageFileUnion)
   async deleteFile(
     @Args('bucketNameArguments') { bucketName }: BucketNameArgs,
     @Args('uuid') uuid: string,
