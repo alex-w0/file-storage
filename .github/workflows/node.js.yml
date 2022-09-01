@@ -47,6 +47,7 @@ jobs:
       - name: Run test
         working-directory: storage-ui
         run: |
+          npm ci
           npm run test:unit
   build:
     runs-on: ubuntu-latest
