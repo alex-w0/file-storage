@@ -9,6 +9,9 @@ on:
   pull_request:
     branches: [ "main" ]
 
+defaults:
+  run:
+    working-directory: storage-ui
 
 jobs:
   type-check:
