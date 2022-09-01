@@ -61,7 +61,10 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
-          cache: 'npm'
-      - name: Run build
+          cache-dependency-path: storage-ui/package-lock.json
+          cache: 'npmm'
+      - name: Install dependencies && run build
+        working-directory: storage-ui
         run: |
+          npm ci
           npm run build
