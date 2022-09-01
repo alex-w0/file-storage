@@ -45,7 +45,7 @@ jobs:
           cache-dependency-path: storage-ui/package-lock.json
           cache: 'npm'
       - name: Run test
-        working-directory: ui-storage
+        working-directory: storage-ui
         run: |
           npm run test:unit
   build:
