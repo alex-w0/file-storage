@@ -187,11 +187,19 @@ export class AWSClientService {
     bucketName: string,
     { name }: CreateDirectoryInput,
   ): Promise<StorageDirectory> {
-    // const file = await this.redisClient.getFile(bucketName, uuid);
+    // Directorie keys must end with a /
+    name += '/';
 
-    // if (file === null) {
-    //   throw new NotFoundException('File does not exists!');
-    // }
+    const fileExists = await this.redisClient.checkIfFileKeyExist(
+      bucketName,
+      name,
+    );
+
+    if (fileExists === true) {
+      throw new BadRequestException(
+        `A directory already exists with the name ${name}!`,
+      );
+    }
 
     const putObjectCommand = new PutObjectCommand({
       Bucket: bucketName,
@@ -208,15 +216,14 @@ export class AWSClientService {
 
     console.log(putObjectCommandResponse);
 
-    // const fileRemoved = await this.redisClient.storeFile(bucketName, uuid);
-
-    // if (fileRemoved === false) {
-    //   throw new InternalServerErrorException(
-    //     `File ${uuid} could not be removed on the bucket ${bucketName}!`,
-    //   );
-    // }
-
-    return {} as any;
+    return await this.redisClient.storeFile(bucketName, {
+      storageType: StorageFileType.Directory,
+      eTag: putObjectCommandResponse.ETag,
+      s3ObjectKey: name,
+      metaData: {
+        name,
+      },
+    });
   }
 
   async deleteS3File(bucketName: string, uuid: string): Promise<StorageFile> {

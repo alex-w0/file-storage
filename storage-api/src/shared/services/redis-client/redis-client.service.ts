@@ -5,6 +5,7 @@ import { randomUUID } from 'crypto';
 import { CustomTypeToRedisJSON } from 'src/shared/utils/json-converter';
 import { StoreFileArguments } from 'src/shared/models/redis-client.model';
 import { StorageFile } from 'src/storage/models/storage-file.model';
+import { StorageFileType } from 'src/shared/enums/storage-file-type';
 
 @Injectable()
 export class RedisClientService {
@@ -75,6 +76,8 @@ export class RedisClientService {
 
     await this.#client.json.set(s3RedisKey, '$', CustomTypeToRedisJSON(s3File));
     await this.#client.sAdd(`${bucketName}:s3Keys`, s3File.s3ObjectKey);
+    // Defines on which directory the file is located
+    await this.#client.sAdd(`${bucketName}:level:root`, s3File.uuid);
 
     return this.getFile(bucketName, s3File.uuid) as Promise<T>;
   }
