@@ -9,28 +9,54 @@ on:
   pull_request:
     branches: [ "main" ]
 
+
 jobs:
-  build:
-
+  type-check:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: storage-ui
-
     strategy:
       matrix:
-        node-version: [16.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
+        node: [16]
     steps:
-    - uses: actions/checkout@v3
-    - name: File Storage UI
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run:
-        
-        npm ci
-    - run: npm run build --if-present
-    - run: npm test
+      - name: Checkout Commit
+        uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+          cache: 'npm'
+      - name: Check types
+        run: |
+          npm run type-check
+  unit-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [16]
+    steps:
+      - name: Checkout Commit
+        uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+          cache: 'npm'
+      - name: Run test
+        run: |
+          npm run test:unit
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [16]
+    needs: [type-check, unit-test]
+    steps:
+      - name: Checkout Commit
+        uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+          cache: 'npm'
+      - name: Run build
+        run: |
+          npm run build
