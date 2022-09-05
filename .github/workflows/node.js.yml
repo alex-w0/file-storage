@@ -62,7 +62,7 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
           cache-dependency-path: storage-ui/package-lock.json
-          cache: 'npmm'
+          cache: 'npm'
       - name: Install dependencies && run build
         working-directory: storage-ui
         run: |
