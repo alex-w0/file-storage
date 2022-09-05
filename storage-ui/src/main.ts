@@ -1,6 +1,9 @@
-import { createApp } from "vue";
-import App from "./App.vue";
+import { defineCustomElement } from "vue";
+import StorageGallery from "./widgets/StorageGallery.ce.vue";
 
 import "./assets/main.css";
 
-createApp(App).mount("#app");
+const StorageGalleryWidget = defineCustomElement(StorageGallery);
+
+// Register the custom element.
+customElements.define("file-storage-gallery-widget", StorageGalleryWidget);
