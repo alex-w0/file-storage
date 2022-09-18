@@ -13,6 +13,10 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
   },
   "dependencies": {
+    "@material/button": "^14.0.0",
+    "@material/card": "^14.0.0",
+    "@material/fab": "^14.0.0",
+    "@material/list": "^14.0.0",
     "vue": "^3.2.37"
   },
   "devDependencies": {

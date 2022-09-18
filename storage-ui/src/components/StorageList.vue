@@ -3,12 +3,12 @@ import StorageListItem from "./StorageListItem.vue";
 </script>
 
 <template>
-  <div class="storageList">
+  <ul class="mdc-list mdc-list--two-line storageList">
     <StorageListItem
       v-for="index in 10"
       :key="index"
       file-name="Item 1"
-      image-url="https://image.shutterstock.com/image-photo/epic-red-golden-clouds-above-600w-1935806773.jpg"
+      image-url="https://reactnativecode.com/wp-content/uploads/2018/02/Default_Image_Thumbnail.png"
     ></StorageListItem>
-  </div>
+  </ul>
 </template>

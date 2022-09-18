@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import StorageList from "../components/StorageList.vue";
-import HelloWorld from "../components/HelloWorld.vue";
-
-import * as mdc from "material-components-web";
-
-mdc.autoInit();
 </script>
 
 <template>
+  <link
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/icon?family=Material+Icons"
+  />
+
   <div class="storageGallery">
     <StorageList></StorageList>
   </div>
@@ -35,23 +35,26 @@ mdc.autoInit();
 </template>
 
 <style lang="scss">
+@use "@material/card";
+@use "@material/button/styles";
+@use "@material/fab";
+@use "@material/list";
+
+@include card.core-styles;
+@include fab.core-styles;
+@include list.deprecated-core-styles;
+
 :host {
   --background: #fff;
 }
 
 .storageList {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-
   &Item {
-    transition: box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1);
-    display: block;
-    position: relative;
-    padding: 16px;
-    border-radius: 4px;
-    background: var(--background);
-    box-shadow: 0 1px 2px rgb(0 0 0 / 20%);
+    &__preview {
+      img {
+        width: 65px;
+      }
+    }
   }
 }
 
