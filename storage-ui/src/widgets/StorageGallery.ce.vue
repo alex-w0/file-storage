@@ -35,12 +35,19 @@ import StorageList from "../components/StorageList.vue";
 </template>
 
 <style lang="scss">
-@use "@material/card";
-@use "@material/button/styles";
+@use "@material/theme" with (
+  $primary: #a1c861,
+  $secondary: #303030,
+  $background: #fff
+);
+
+@use "@material/button/styles" as button-styles;
 @use "@material/fab";
 @use "@material/list";
+@use "@material/checkbox";
+@use "@material/icon-button/styles" as icon-button-styles;
 
-@include card.core-styles;
+@include checkbox.core-styles;
 @include fab.core-styles;
 @include list.deprecated-core-styles;
 
@@ -55,11 +62,19 @@ import StorageList from "../components/StorageList.vue";
         width: 65px;
       }
     }
+
+    &__actions {
+      margin-left: auto;
+    }
   }
 }
 
 img {
   width: 100%;
   height: auto;
+}
+
+.material-icons.small {
+  transform: scale(0.8);
 }
 </style>
