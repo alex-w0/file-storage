@@ -16,30 +16,6 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="storageList__actions">
-    <button class="mdc-button mdc-button--outlined">
-      <span class="mdc-button__ripple"></span>
-      <i class="material-icons mdc-button__icon" aria-hidden="true">delete</i>
-      <span class="mdc-button__label">Delete</span>
-    </button>
-
-    <button class="mdc-button mdc-button--outlined">
-      <span class="mdc-button__ripple"></span>
-      <i class="material-icons mdc-button__icon" aria-hidden="true"
-        >file_download</i
-      >
-      <span class="mdc-button__label">Download</span>
-    </button>
-
-    <button class="mdc-button mdc-button--raised">
-      <span class="mdc-button__ripple"></span>
-      <i class="material-icons mdc-button__icon" aria-hidden="true"
-        >file_upload</i
-      >
-      <span class="mdc-button__label">Upload</span>
-    </button>
-  </div>
-
   <div class="mdc-data-table storageList" ref="dataTableElement">
     <div class="mdc-data-table__table-container">
       <table class="mdc-data-table__table" aria-label="Dessert calories">
@@ -103,9 +79,28 @@ onMounted(() => {
               class="mdc-data-table__header-cell"
               role="columnheader"
               scope="col"
-              colspan="2"
             >
               Created at
+            </th>
+            <th
+              class="mdc-data-table__header-cell"
+              role="columnheader"
+              scope="col"
+            >
+              <div class="storageListItem__actions">
+                <button class="mdc-icon-button material-icons small">
+                  <div class="mdc-icon-button__ripple"></div>
+                  file_upload
+                </button>
+                <button class="mdc-icon-button material-icons small">
+                  <div class="mdc-icon-button__ripple"></div>
+                  create_new_folder
+                </button>
+                <button class="mdc-icon-button material-icons small">
+                  <div class="mdc-icon-button__ripple"></div>
+                  delete_forever
+                </button>
+              </div>
             </th>
           </tr>
         </thead>
