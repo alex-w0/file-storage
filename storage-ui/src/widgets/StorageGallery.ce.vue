@@ -43,19 +43,33 @@ import StorageList from "../components/StorageList.vue";
 
 @use "@material/button/styles" as button-styles;
 @use "@material/fab";
-@use "@material/list";
 @use "@material/checkbox";
 @use "@material/icon-button/styles" as icon-button-styles;
 
+@use "@material/data-table/styles" as data-table-styles;
+
 @include checkbox.core-styles;
 @include fab.core-styles;
-@include list.deprecated-core-styles;
 
 :host {
   --background: #fff;
 }
 
+.storageGallery {
+  --mdc-outlined-button-outline-color: #a1c861;
+  --mdc-protected-button-label-text-color: #fff;
+  --mdc-outlined-button-hover-state-layer-color: #303030;
+}
+
 .storageList {
+  width: 100%;
+
+  &__actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+  }
+
   &Item {
     &__preview {
       img {
@@ -64,7 +78,8 @@ import StorageList from "../components/StorageList.vue";
     }
 
     &__actions {
-      margin-left: auto;
+      display: flex;
+      justify-content: flex-end;
     }
   }
 }
@@ -76,5 +91,10 @@ img {
 
 .material-icons.small {
   transform: scale(0.8);
+}
+
+.mdc-button--outlined:not(:disabled) {
+  color: #303030;
+  border-color: #303030;
 }
 </style>

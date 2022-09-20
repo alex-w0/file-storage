@@ -1,19 +1,19 @@
 <script setup lang="ts">
 const props = defineProps({
+  storageId: String,
   fileName: String,
   imageUrl: String,
 });
 </script>
 
 <template>
-  <li class="mdc-list-item" tabindex="0">
-    <span class="mdc-list-item__ripple"></span>
-    <span class="mdc-list-item__graphic">
-      <div class="mdc-checkbox">
+  <tr :data-row-id="storageId" class="mdc-data-table__row">
+    <td class="mdc-data-table__cell mdc-data-table__cell--checkbox">
+      <div class="mdc-checkbox mdc-data-table__row-checkbox">
         <input
           type="checkbox"
           class="mdc-checkbox__native-control"
-          id="storageListItem"
+          aria-labelledby="u0"
         />
         <div class="mdc-checkbox__background">
           <svg class="mdc-checkbox__checkmark" viewBox="0 0 24 24">
@@ -25,33 +25,31 @@ const props = defineProps({
           </svg>
           <div class="mdc-checkbox__mixedmark"></div>
         </div>
+        <div class="mdc-checkbox__ripple"></div>
       </div>
-    </span>
-    <!-- <span class="mdc-list-item__graphic">
-      <div class="storageListItem__preview">
-        <img :src="$props.imageUrl" />
+    </td>
+    <th class="mdc-data-table__cell" scope="row" id="u0">
+      {{ props.fileName }}
+    </th>
+    <td class="mdc-data-table__cell">File</td>
+    <td class="mdc-data-table__cell">20mb</td>
+    <td class="mdc-data-table__cell">jpg</td>
+    <td class="mdc-data-table__cell">2022-10-10</td>
+    <td class="mdc-data-table__cell">
+      <div class="storageListItem__actions">
+        <button class="mdc-icon-button material-icons small">
+          <div class="mdc-icon-button__ripple"></div>
+          edit
+        </button>
+        <button class="mdc-icon-button material-icons small">
+          <div class="mdc-icon-button__ripple"></div>
+          open_in_new
+        </button>
+        <button class="mdc-icon-button material-icons small">
+          <div class="mdc-icon-button__ripple"></div>
+          delete
+        </button>
       </div>
-    </span> -->
-    <span class="mdc-list-item__text">
-      <span class="mdc-list-item__primary-text">{{ props.fileName }}</span>
-      <span class="mdc-list-item__secondary-text">20mb</span>
-    </span>
-    <span
-      aria-hidden="true"
-      class="mdc-list-item__meta storageListItem__actions"
-    >
-      <button class="mdc-icon-button material-icons small">
-        <div class="mdc-icon-button__ripple"></div>
-        edit
-      </button>
-      <button class="mdc-icon-button material-icons small">
-        <div class="mdc-icon-button__ripple"></div>
-        open_in_new
-      </button>
-      <button class="mdc-icon-button material-icons small">
-        <div class="mdc-icon-button__ripple"></div>
-        delete
-      </button>
-    </span>
-  </li>
+    </td>
+  </tr>
 </template>
