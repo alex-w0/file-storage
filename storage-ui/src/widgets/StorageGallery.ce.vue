@@ -1,5 +1,12 @@
 <script setup lang="ts">
+import { initializeApolloClient } from "@/apollo-client";
+import { DefaultApolloClient } from "@vue/apollo-composable/dist";
+import { provide } from "vue";
 import StorageList from "../components/StorageList.vue";
+
+const apolloClient = initializeApolloClient();
+
+provide(DefaultApolloClient, apolloClient);
 </script>
 
 <template>
@@ -27,6 +34,9 @@ import StorageList from "../components/StorageList.vue";
 
 @use "@material/data-table/styles" as data-table-styles;
 
+@use "@material/linear-progress";
+
+@include linear-progress.core-styles;
 @include checkbox.core-styles;
 @include fab.core-styles;
 
@@ -42,6 +52,10 @@ import StorageList from "../components/StorageList.vue";
 
 .storageList {
   width: 100%;
+
+  &__loader {
+    top: 56px;
+  }
 
   &__actions {
     display: flex;

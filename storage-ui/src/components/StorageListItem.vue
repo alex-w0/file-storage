@@ -1,13 +1,14 @@
 <script setup lang="ts">
+import type { PropType } from "vue";
+import type { StorageFile } from "../generated/graphql";
+
 const props = defineProps({
-  storageId: String,
-  fileName: String,
-  imageUrl: String,
+  storageFile: Object as PropType<StorageFile>,
 });
 </script>
 
 <template>
-  <tr :data-row-id="storageId" class="mdc-data-table__row">
+  <tr :data-row-id="storageFile?.uuid" class="mdc-data-table__row">
     <td class="mdc-data-table__cell mdc-data-table__cell--checkbox">
       <div class="mdc-checkbox mdc-data-table__row-checkbox">
         <input
@@ -29,7 +30,11 @@ const props = defineProps({
       </div>
     </td>
     <th class="mdc-data-table__cell" scope="row" id="u0">
-      {{ props.fileName }}
+      {{
+        props.storageFile?.__typename === "StorageDirectory"
+          ? props.storageFile.metaData.name
+          : ""
+      }}
     </th>
     <td class="mdc-data-table__cell">File</td>
     <td class="mdc-data-table__cell">20mb</td>

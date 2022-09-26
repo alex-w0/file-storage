@@ -1,0 +1,27 @@
+query getAllFiles($bucketNameArguments: BucketNameArgs!) {
+  files(bucketNameArguments: $bucketNameArguments) {
+    ... on StorageImage {
+      uuid
+      s3ObjectKey
+      url
+      eTag
+      createdAt
+      updatedAt
+      metaData {
+        titleTag
+        altTag
+      }
+    }
+
+    ... on StorageDirectory {
+      uuid
+      s3ObjectKey
+      eTag
+      createdAt
+      updatedAt
+      metaData {
+        name
+      }
+    }
+  }
+}

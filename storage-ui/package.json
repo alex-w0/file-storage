@@ -3,6 +3,8 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "vite",
+    "graphql:generate": "graphql-codegen",
+    "graphql:generate:watch": "graphql-codegen --watch",
     "build": "run-p type-check build-only",
     "preview": "vite preview --port 4173",
     "test:unit": "vitest --environment jsdom",
@@ -13,14 +15,22 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
   },
   "dependencies": {
+    "@apollo/client": "^3.6.9",
     "@material/button": "^14.0.0",
     "@material/checkbox": "^14.0.0",
     "@material/data-table": "^14.0.0",
     "@material/fab": "^14.0.0",
     "@material/icon-button": "^14.0.0",
+    "@material/progress-indicator": "^14.0.0",
+    "@vue/apollo-composable": "^4.0.0-alpha.19",
+    "graphql": "^16.6.0",
     "vue": "^3.2.37"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "2.12.1",
+    "@graphql-codegen/typed-document-node": "^2.3.3",
+    "@graphql-codegen/typescript": "2.7.3",
+    "@graphql-codegen/typescript-operations": "2.5.3",
     "@rushstack/eslint-patch": "^1.1.4",
     "@types/jsdom": "^20.0.0",
     "@types/node": "^16.11.47",
