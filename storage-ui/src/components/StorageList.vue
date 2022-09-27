@@ -3,19 +3,40 @@ import { ref, onMounted, type Ref } from "vue";
 import StorageListItem from "./StorageListItem.vue";
 
 import { MDCDataTable } from "@material/data-table";
+import { MDCLinearProgress } from "@material/linear-progress";
+import { useQuery } from "@vue/apollo-composable/dist";
+import { GetAllFilesDocument } from "../generated/graphql";
+import { useFiles } from "@/composition-api/useFiles";
 
 const dataTableElement: Ref<HTMLElement | null> = ref(null);
+const dataTableLoadingElement: Ref<HTMLElement | null> = ref(null);
+
+const { files, isLoading, loadFiles } = useFiles();
+
+loadFiles();
+
+// const { result, loading } = useQuery(GetAllFilesDocument, {
+//   bucketNameArguments: {
+//     bucketName: "oekotex",
+//   },
+// });
 
 onMounted(() => {
   if (dataTableElement.value === null) {
     throw new Error("DataTableElement is not defined");
   }
 
+  if (dataTableLoadingElement.value === null) {
+    throw new Error("DataTableElement is not defined");
+  }
+
   new MDCDataTable(dataTableElement.value);
+  new MDCLinearProgress(dataTableLoadingElement.value);
 });
 </script>
 
 <template>
+  {{ files }}
   <div class="mdc-data-table storageList" ref="dataTableElement">
     <div class="mdc-data-table__table-container">
       <table class="mdc-data-table__table" aria-label="Dessert calories">
@@ -106,14 +127,44 @@ onMounted(() => {
         </thead>
         <tbody class="mdc-data-table__content">
           <StorageListItem
+            v-for="file in files"
+            :key="file.uuid"
+            :storage-file="file"
+          ></StorageListItem>
+          <!-- <StorageListItem
             v-for="index in 10"
             :key="index"
             file-name="Item 1"
             :storage-id="index.toString()"
             image-url="https://reactnativecode.com/wp-content/uploads/2018/02/Default_Image_Thumbnail.png"
-          ></StorageListItem>
+          ></StorageListItem> -->
         </tbody>
       </table>
+    </div>
+    <div
+      class="mdc-data-table__progress-indicator storageList__loader"
+      :style="`display: ${isLoading ? 'block' : 'none'}`"
+    >
+      <div class="mdc-data-table__scrim"></div>
+      <div
+        class="mdc-linear-progress mdc-linear-progress--indeterminate mdc-data-table__linear-progress"
+        role="progressbar"
+        ref="dataTableLoadingElement"
+        aria-label="Data is being loaded..."
+      >
+        <div class="mdc-linear-progress__buffer">
+          <div class="mdc-linear-progress__buffer-bar"></div>
+          <div class="mdc-linear-progress__buffer-dots"></div>
+        </div>
+        <div class="mdc-linear-progress__bar mdc-linear-progress__primary-bar">
+          <span class="mdc-linear-progress__bar-inner"></span>
+        </div>
+        <div
+          class="mdc-linear-progress__bar mdc-linear-progress__secondary-bar"
+        >
+          <span class="mdc-linear-progress__bar-inner"></span>
+        </div>
+      </div>
     </div>
   </div>
 </template>

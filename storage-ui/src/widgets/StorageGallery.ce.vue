@@ -64,6 +64,10 @@ provide(DefaultApolloClient, apolloClient);
   }
 
   &Item {
+    &__icon {
+      display: block;
+    }
+
     &__preview {
       img {
         width: 65px;

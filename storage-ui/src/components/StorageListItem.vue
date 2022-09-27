@@ -1,14 +1,42 @@
 <script setup lang="ts">
 import type { PropType } from "vue";
 import type { StorageFile } from "../generated/graphql";
+import { isStorageDirectory } from "../utils/assertion";
 
-const props = defineProps({
-  storageFile: Object as PropType<StorageFile>,
+defineProps({
+  storageFile: {
+    type: Object as PropType<StorageFile>,
+    required: true,
+  },
 });
+
+function openStorageDirectory(uuid: string) {
+  console.log(uuid);
+}
+
+function editStorageItem(uuid: string) {
+  console.log("edit");
+}
+
+function deleteStorageItem(uuid: string) {
+  console.log("delete");
+}
+
+const previewStorageItem = (uuid: string) => {
+  console.log(uuid);
+};
 </script>
 
 <template>
-  <tr :data-row-id="storageFile?.uuid" class="mdc-data-table__row">
+  <tr
+    @click="
+      isStorageDirectory(storageFile)
+        ? openStorageDirectory(storageFile.uuid)
+        : undefined
+    "
+    :data-row-id="storageFile.uuid"
+    class="mdc-data-table__row"
+  >
     <td class="mdc-data-table__cell mdc-data-table__cell--checkbox">
       <div class="mdc-checkbox mdc-data-table__row-checkbox">
         <input
@@ -31,26 +59,48 @@ const props = defineProps({
     </td>
     <th class="mdc-data-table__cell" scope="row" id="u0">
       {{
-        props.storageFile?.__typename === "StorageDirectory"
-          ? props.storageFile.metaData.name
+        storageFile.__typename === "StorageDirectory"
+          ? storageFile.metaData.name
           : ""
       }}
     </th>
-    <td class="mdc-data-table__cell">File</td>
-    <td class="mdc-data-table__cell">20mb</td>
-    <td class="mdc-data-table__cell">jpg</td>
-    <td class="mdc-data-table__cell">2022-10-10</td>
+    <td class="mdc-data-table__cell">
+      <div class="storageListItem__icon">
+        <span v-if="isStorageDirectory(storageFile)" class="material-icons"
+          >folder</span
+        >
+        <span v-else class="material-icons">image</span>
+      </div>
+    </td>
+    <td class="mdc-data-table__cell">
+      <template v-if="isStorageDirectory(storageFile)">-</template>
+      <template v-else>20mb</template>
+    </td>
+    <td class="mdc-data-table__cell">
+      <template v-if="isStorageDirectory(storageFile)">-</template>
+      <template v-else>jpg</template>
+    </td>
+    <td class="mdc-data-table__cell">{{ storageFile.createdAt }}</td>
     <td class="mdc-data-table__cell">
       <div class="storageListItem__actions">
-        <button class="mdc-icon-button material-icons small">
+        <button
+          @click.stop.prevent="editStorageItem(storageFile.uuid)"
+          class="mdc-icon-button material-icons small"
+        >
           <div class="mdc-icon-button__ripple"></div>
           edit
         </button>
-        <button class="mdc-icon-button material-icons small">
+        <button
+          @click.stop.prevent="previewStorageItem(storageFile.uuid)"
+          class="mdc-icon-button material-icons small"
+        >
           <div class="mdc-icon-button__ripple"></div>
           open_in_new
         </button>
-        <button class="mdc-icon-button material-icons small">
+        <button
+          @click.stop.prevent="deleteStorageItem(storageFile.uuid)"
+          class="mdc-icon-button material-icons small"
+        >
           <div class="mdc-icon-button__ripple"></div>
           delete
         </button>
