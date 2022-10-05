@@ -1,12 +1,33 @@
 <script setup lang="ts">
 import { initializeApolloClient } from "@/apollo-client";
 import { DefaultApolloClient } from "@vue/apollo-composable/dist";
-import { provide } from "vue";
+import { onMounted, provide, ref, watchEffect, type Ref } from "vue";
 import StorageList from "../components/StorageList.vue";
+import { MDCBanner } from "@material/banner";
+import { configuration } from "@/composition-api/configuration";
 
+const props = defineProps({
+  bucketName: {
+    type: String,
+    required: true,
+  },
+});
+
+const invalidSetupConfigurationElement: Ref<HTMLElement | null> = ref(null);
 const apolloClient = initializeApolloClient();
 
 provide(DefaultApolloClient, apolloClient);
+
+watchEffect(() => {
+  configuration.bucketName = props.bucketName;
+});
+
+onMounted(() => {
+  if (invalidSetupConfigurationElement.value) {
+    const el = new MDCBanner(invalidSetupConfigurationElement.value);
+    el.open();
+  }
+});
 </script>
 
 <template>
@@ -15,8 +36,25 @@ provide(DefaultApolloClient, apolloClient);
     href="https://fonts.googleapis.com/icon?family=Material+Icons"
   />
 
-  <div class="storageGallery">
+  <div v-if="props.bucketName" class="storageGallery">
     <StorageList></StorageList>
+  </div>
+  <div
+    v-else
+    class="mdc-banner"
+    role="banner"
+    ref="invalidSetupConfigurationElement"
+  >
+    <div class="mdc-banner__content" role="alertdialog" aria-live="assertive">
+      <div class="mdc-banner__graphic-text-wrapper">
+        <div class="mdc-banner__graphic" role="img" alt="">
+          <i class="material-icons mdc-banner__icon">error</i>
+        </div>
+        <div class="mdc-banner__text">
+          The configuration of the widget was not configured properly.
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -35,6 +73,7 @@ provide(DefaultApolloClient, apolloClient);
 @use "@material/data-table/styles" as data-table-styles;
 
 @use "@material/linear-progress";
+@use "@material/banner/styles";
 
 @include linear-progress.core-styles;
 @include checkbox.core-styles;
@@ -93,5 +132,9 @@ img {
 .mdc-button--outlined:not(:disabled) {
   color: #303030;
   border-color: #303030;
+}
+
+.mdc-banner__graphic {
+  background-color: #b00020;
 }
 </style>

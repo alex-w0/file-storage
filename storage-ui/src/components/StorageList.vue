@@ -4,8 +4,6 @@ import StorageListItem from "./StorageListItem.vue";
 
 import { MDCDataTable } from "@material/data-table";
 import { MDCLinearProgress } from "@material/linear-progress";
-import { useQuery } from "@vue/apollo-composable/dist";
-import { GetAllFilesDocument } from "../generated/graphql";
 import { useFiles } from "@/composition-api/useFiles";
 
 const dataTableElement: Ref<HTMLElement | null> = ref(null);
@@ -14,12 +12,6 @@ const dataTableLoadingElement: Ref<HTMLElement | null> = ref(null);
 const { files, isLoading, loadFiles } = useFiles();
 
 loadFiles();
-
-// const { result, loading } = useQuery(GetAllFilesDocument, {
-//   bucketNameArguments: {
-//     bucketName: "oekotex",
-//   },
-// });
 
 onMounted(() => {
   if (dataTableElement.value === null) {
@@ -131,13 +123,6 @@ onMounted(() => {
             :key="file.uuid"
             :storage-file="file"
           ></StorageListItem>
-          <!-- <StorageListItem
-            v-for="index in 10"
-            :key="index"
-            file-name="Item 1"
-            :storage-id="index.toString()"
-            image-url="https://reactnativecode.com/wp-content/uploads/2018/02/Default_Image_Thumbnail.png"
-          ></StorageListItem> -->
         </tbody>
       </table>
     </div>

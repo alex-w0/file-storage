@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.6.9",
+    "@material/banner": "^14.0.0",
     "@material/button": "^14.0.0",
     "@material/checkbox": "^14.0.0",
     "@material/data-table": "^14.0.0",
@@ -50,6 +51,7 @@
     "start-server-and-test": "^1.14.0",
     "typescript": "~4.7.4",
     "vite": "^3.0.4",
+    "vite-plugin-html-env": "^1.2.7",
     "vitest": "^0.21.0",
     "vue-tsc": "^0.39.5"
   }

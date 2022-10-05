@@ -1,4 +1,5 @@
 import { fileURLToPath, URL } from "node:url";
+import VitePluginHtmlEnv from "vite-plugin-html-env";
 
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
@@ -13,6 +14,10 @@ export default defineConfig({
           isCustomElement: (tag) => tag.includes("-"),
         },
       },
+    }),
+    VitePluginHtmlEnv({
+      compiler: true,
+      // compiler: false // old
     }),
   ],
   resolve: {

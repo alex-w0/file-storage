@@ -4,6 +4,7 @@ import {
 } from "@/generated/graphql";
 import { useQuery } from "@vue/apollo-composable/dist";
 import { ref, watchEffect, type Ref } from "vue";
+import { configuration } from "./configuration";
 
 export function useFiles() {
   const files: Ref<GetAllFilesQuery["files"]> = ref([]);
@@ -12,7 +13,7 @@ export function useFiles() {
   const loadFiles = () => {
     const { result, loading } = useQuery(GetAllFilesDocument, {
       bucketNameArguments: {
-        bucketName: "---",
+        bucketName: configuration.bucketName,
       },
     });
 
