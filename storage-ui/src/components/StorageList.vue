@@ -118,11 +118,18 @@ onMounted(() => {
           </tr>
         </thead>
         <tbody v-if="files" class="mdc-data-table__content">
-          <StorageListItem
-            v-for="file in files"
-            :key="file.uuid"
-            :storage-file="file"
-          ></StorageListItem>
+          <template v-if="files.length">
+            <StorageListItem
+              v-for="file in files"
+              :key="file.uuid"
+              :storage-file="file"
+            ></StorageListItem>
+          </template>
+          <tr v-else>
+            <td class="storageList__noData" colspan="7">
+              This directory is empty
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>

@@ -104,6 +104,11 @@ onMounted(() => {
     justify-content: flex-end;
   }
 
+  &__noData {
+    padding: 16px 20px;
+    text-align: center;
+  }
+
   &Item {
     &__icon {
       display: block;
