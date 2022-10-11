@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { initializeApolloClient } from "@/apollo-client";
-import { DefaultApolloClient } from "@vue/apollo-composable/dist";
-import { onMounted, provide, ref, watchEffect, type Ref } from "vue";
+import { provideApolloClients } from "@vue/apollo-composable";
+import { onMounted, ref, watchEffect, type Ref } from "vue";
 import StorageList from "../components/StorageList.vue";
 import { MDCBanner } from "@material/banner";
 import { configuration } from "@/composition-api/configuration";
@@ -16,7 +16,9 @@ const props = defineProps({
 const invalidSetupConfigurationElement: Ref<HTMLElement | null> = ref(null);
 const apolloClient = initializeApolloClient();
 
-provide(DefaultApolloClient, apolloClient);
+provideApolloClients({
+  default: apolloClient,
+});
 
 watchEffect(() => {
   configuration.bucketName = props.bucketName;

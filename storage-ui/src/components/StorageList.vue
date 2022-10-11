@@ -117,7 +117,7 @@ onMounted(() => {
             </th>
           </tr>
         </thead>
-        <tbody class="mdc-data-table__content">
+        <tbody v-if="files" class="mdc-data-table__content">
           <StorageListItem
             v-for="file in files"
             :key="file.uuid"

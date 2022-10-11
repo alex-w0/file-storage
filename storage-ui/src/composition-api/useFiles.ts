@@ -1,20 +1,22 @@
 import {
   GetAllFilesDocument,
   type GetAllFilesQuery,
+  type GetAllFilesQueryVariables,
 } from "@/generated/graphql";
-import { useQuery } from "@vue/apollo-composable/dist";
+import { useQuery } from "@vue/apollo-composable";
 import { ref, watchEffect, type Ref } from "vue";
 import { configuration } from "./configuration";
 
-export function useFiles() {
-  const files: Ref<GetAllFilesQuery["files"]> = ref([]);
-  const isLoading: Ref<boolean> = ref(false);
+const files: Ref<GetAllFilesQuery["files"]> = ref([]);
+const isLoading: Ref<boolean> = ref(false);
 
-  const loadFiles = () => {
+export function useFiles() {
+  const loadFiles = (options?: GetAllFilesQueryVariables["options"]) => {
     const { result, loading } = useQuery(GetAllFilesDocument, {
       bucketNameArguments: {
         bucketName: configuration.bucketName,
       },
+      options,
     });
 
     watchEffect(() => {

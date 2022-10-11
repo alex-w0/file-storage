@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useFiles } from "@/composition-api/useFiles";
 import type { PropType } from "vue";
 import type { StorageFile } from "../generated/graphql";
 import { isStorageDirectory } from "../utils/assertion";
@@ -10,8 +11,12 @@ defineProps({
   },
 });
 
+const { loadFiles } = useFiles();
+
 function openStorageDirectory(uuid: string) {
-  console.log(uuid);
+  loadFiles({
+    directoryLevel: uuid,
+  });
 }
 
 function editStorageItem(uuid: string) {

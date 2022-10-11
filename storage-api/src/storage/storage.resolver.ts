@@ -11,6 +11,7 @@ import { AWSClientService } from 'src/shared/services/aws-client/aws-client.serv
 import { RedisClientService } from 'src/shared/services/redis-client/redis-client.service';
 import { StorageFile, StorageFileUnion } from './models/storage-file.model';
 import { StorageDirectory } from './models/storage-directory.model';
+import { StorageFilesOptions } from './dto/storage-file.input';
 
 @Resolver(() => StorageImage)
 export class StorageResolver {
@@ -22,8 +23,17 @@ export class StorageResolver {
   @Query(() => [StorageFileUnion])
   async files(
     @Args('bucketNameArguments') { bucketName }: BucketNameArgs,
+    @Args({
+      name: 'options',
+      type: () => StorageFilesOptions,
+      nullable: true,
+    })
+    options: StorageFilesOptions,
   ): Promise<StorageFile[]> {
-    const files = await this.redisClientService.getFiles(bucketName);
+    const files = await this.redisClientService.getFiles(
+      bucketName,
+      options?.directoryLevel,
+    );
 
     return files;
   }

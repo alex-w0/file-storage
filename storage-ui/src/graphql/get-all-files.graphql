@@ -1,5 +1,5 @@
-query getAllFiles($bucketNameArguments: BucketNameArgs!) {
-  files(bucketNameArguments: $bucketNameArguments) {
+query getAllFiles($bucketNameArguments: BucketNameArgs!, $options: StorageFilesOptions) {
+  files(bucketNameArguments: $bucketNameArguments, options: $options) {
     ... on StorageImage {
       uuid
       s3ObjectKey

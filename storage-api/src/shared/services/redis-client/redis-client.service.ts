@@ -1,11 +1,15 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createClient, RedisClientType } from 'redis';
 import { randomUUID } from 'crypto';
 import { CustomTypeToRedisJSON } from 'src/shared/utils/json-converter';
 import { StoreFileArguments } from 'src/shared/models/redis-client.model';
 import { StorageFile } from 'src/storage/models/storage-file.model';
-import { StorageFileType } from 'src/shared/enums/storage-file-type';
+import { isStorageDirectory } from 'src/shared/utils/storage-file-assertions';
 
 @Injectable()
 export class RedisClientService {
@@ -37,14 +41,36 @@ export class RedisClientService {
     };
   }
 
-  async getFiles(bucketName: string): Promise<StorageFile[]> {
-    // Redis command: json.get {bucketName}:s3:{uuid} '.'
-    const { cursor, keys } = await this.#client.scan(0, {
-      COUNT: 1000,
-      MATCH: `${bucketName}:s3:*`,
-    });
+  async getFiles(
+    bucketName: string,
+    directoryLevel?: string,
+  ): Promise<StorageFile[]> {
+    // Fallback to root level if no directory level is defined
+    directoryLevel ??= 'root';
 
-    const response = await this.#client.json.mGet(keys, '.');
+    const directoryKey = `${bucketName}:level:${directoryLevel}`;
+
+    const directory = await this.#client.exists(directoryKey);
+
+    if (directory <= 0) {
+      throw new NotFoundException(
+        'Directory level does not exist, please define a valid uuid!',
+      );
+    }
+
+    const directoryItems = (await this.#client.json.get(
+      directoryKey,
+    )) as string[];
+
+    if (directoryItems.length <= 0) {
+      return [];
+    }
+
+    const directoryItemKeys = directoryItems.map(
+      (directoryItem) => `${bucketName}:s3:${directoryItem}`,
+    );
+
+    const response = await this.#client.json.mGet(directoryItemKeys, '.');
 
     return response.map(this.#parseRedisJSONToStorageFile);
   }
@@ -76,8 +102,22 @@ export class RedisClientService {
 
     await this.#client.json.set(s3RedisKey, '$', CustomTypeToRedisJSON(s3File));
     await this.#client.sAdd(`${bucketName}:s3Keys`, s3File.s3ObjectKey);
+
+    if (isStorageDirectory(s3File)) {
+      // Defines on which directory the file is located
+      await this.#client.json.set(
+        `${bucketName}:level:${s3File.uuid}`,
+        '$',
+        [],
+      );
+    }
+
     // Defines on which directory the file is located
-    await this.#client.sAdd(`${bucketName}:level:root`, s3File.uuid);
+    await this.#client.json.arrAppend(
+      `${bucketName}:level:root`,
+      '$',
+      s3File.uuid,
+    );
 
     return this.getFile(bucketName, s3File.uuid) as Promise<T>;
   }
@@ -89,7 +129,14 @@ export class RedisClientService {
       bucketName,
     );
 
-    return bucketPositionIndex >= 0;
+    const bucketCreated = bucketPositionIndex >= 0;
+
+    // Create the directory root level key
+    if (bucketCreated) {
+      await this.#client.json.set(`${bucketName}:level:root`, '$', []);
+    }
+
+    return bucketCreated;
   }
 
   async checkIfFileKeyExist(
@@ -111,8 +158,8 @@ export class RedisClientService {
  */
 
 /** Directory Structure
- * {bucketName}:directory:root
- * {bucketName}:directory:152326 -> lists all members from this directory, which can contain s3 files but also folders
+ * {bucketName}:level:root
+ * {bucketName}:level:152326 -> lists all members from this directory, which can contain s3 files but also folders
  */
 
 /** Valid bucket names

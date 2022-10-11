@@ -36,7 +36,7 @@ type StorageDirectory {
 }
 
 type Query {
-  files(bucketNameArguments: BucketNameArgs!): [StorageFile!]!
+  files(bucketNameArguments: BucketNameArgs!, options: StorageFilesOptions): [StorageFile!]!
   file(bucketNameArguments: BucketNameArgs!, uuid: String!): StorageFile!
 }
 
@@ -44,6 +44,10 @@ union StorageFile = StorageDirectory | StorageImage
 
 input BucketNameArgs {
   bucketName: String!
+}
+
+input StorageFilesOptions {
+  directoryLevel: String
 }
 
 type Mutation {

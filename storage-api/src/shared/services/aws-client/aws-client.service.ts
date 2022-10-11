@@ -187,7 +187,7 @@ export class AWSClientService {
     bucketName: string,
     { name }: CreateDirectoryInput,
   ): Promise<StorageDirectory> {
-    // Directorie keys must end with a /
+    // Directory keys must end with a /
     name += '/';
 
     const fileExists = await this.redisClient.checkIfFileKeyExist(
