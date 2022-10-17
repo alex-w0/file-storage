@@ -76,10 +76,12 @@ onMounted(() => {
 
 @use "@material/linear-progress";
 @use "@material/banner/styles";
+@use "@material/dialog";
 
 @include linear-progress.core-styles;
 @include checkbox.core-styles;
 @include fab.core-styles;
+@include dialog.core-styles;
 
 :host {
   --background: #fff;

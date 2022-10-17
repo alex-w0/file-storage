@@ -5,9 +5,11 @@ import StorageListItem from "./StorageListItem.vue";
 import { MDCDataTable } from "@material/data-table";
 import { MDCLinearProgress } from "@material/linear-progress";
 import { useFiles } from "@/composition-api/useFiles";
+import Dialog from "./Dialog.vue";
 
 const dataTableElement: Ref<HTMLElement | null> = ref(null);
 const dataTableLoadingElement: Ref<HTMLElement | null> = ref(null);
+const showCreateDirectoryDialog: Ref<boolean> = ref(false);
 
 const { files, isLoading, loadFiles } = useFiles();
 
@@ -104,7 +106,10 @@ onMounted(() => {
                   <div class="mdc-icon-button__ripple"></div>
                   file_upload
                 </button>
-                <button class="mdc-icon-button material-icons small">
+                <button
+                  @click="showCreateDirectoryDialog = true"
+                  class="mdc-icon-button material-icons small"
+                >
                   <div class="mdc-icon-button__ripple"></div>
                   create_new_folder
                 </button>
@@ -158,4 +163,9 @@ onMounted(() => {
       </div>
     </div>
   </div>
+
+  <Dialog
+    v-if="showCreateDirectoryDialog"
+    dialog-title="Create a new directory"
+  ></Dialog>
 </template>
