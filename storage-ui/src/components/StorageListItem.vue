@@ -62,13 +62,13 @@ const previewStorageItem = (uuid: string) => {
         <div class="mdc-checkbox__ripple"></div>
       </div>
     </td>
-    <th class="mdc-data-table__cell" scope="row" id="u0">
+    <td class="mdc-data-table__cell" scope="row" id="u0">
       {{
         storageFile.__typename === "StorageDirectory"
           ? storageFile.metaData.name
           : ""
       }}
-    </th>
+    </td>
     <td class="mdc-data-table__cell">
       <div class="storageListItem__icon">
         <span v-if="isStorageDirectory(storageFile)" class="material-icons"
