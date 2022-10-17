@@ -15,6 +15,9 @@ export class UploadStorageFileInput {
 
 @InputType()
 export class CreateDirectoryInput {
+  @Field({ nullable: true })
+  directoryLevelUuid?: string;
+
   @Field()
   name: string;
 }

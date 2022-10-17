@@ -26,6 +26,7 @@ import { streamToBuffer } from 'src/shared/utils/stream-to-buffer';
 import { StorageFile } from 'src/storage/models/storage-file.model';
 import { StorageDirectory } from 'src/storage/models/storage-directory.model';
 import { StorageFileType } from 'src/shared/enums/storage-file-type';
+import { isStorageDirectory } from 'src/shared/utils/storage-file-assertions';
 
 @Injectable()
 export class AWSClientService {
@@ -185,14 +186,31 @@ export class AWSClientService {
 
   async createS3Directory(
     bucketName: string,
-    { name }: CreateDirectoryInput,
+    { name, directoryLevelUuid }: CreateDirectoryInput,
   ): Promise<StorageDirectory> {
+    let s3ObjectKey = '';
+
+    if (directoryLevelUuid !== undefined) {
+      const parentDirectory = await this.redisClient.getFile(
+        bucketName,
+        directoryLevelUuid,
+      );
+
+      if (!isStorageDirectory(parentDirectory)) {
+        throw new BadRequestException(
+          'Specified directoryLevelUuid is not a directory!',
+        );
+      }
+
+      s3ObjectKey = parentDirectory.s3ObjectKey + s3ObjectKey;
+    }
+
     // Directory keys must end with a /
-    name += '/';
+    s3ObjectKey += `${name}/`;
 
     const fileExists = await this.redisClient.checkIfFileKeyExist(
       bucketName,
-      name,
+      s3ObjectKey,
     );
 
     if (fileExists === true) {
@@ -203,7 +221,7 @@ export class AWSClientService {
 
     const putObjectCommand = new PutObjectCommand({
       Bucket: bucketName,
-      Key: name,
+      Key: s3ObjectKey,
     });
 
     const putObjectCommandResponse = await this.#client.send(putObjectCommand);
@@ -214,12 +232,11 @@ export class AWSClientService {
       );
     }
 
-    console.log(putObjectCommandResponse);
-
     return await this.redisClient.storeFile(bucketName, {
       storageType: StorageFileType.Directory,
       eTag: putObjectCommandResponse.ETag,
-      s3ObjectKey: name,
+      s3ObjectKey,
+      parentDirectoryUuid: directoryLevelUuid,
       metaData: {
         name,
       },

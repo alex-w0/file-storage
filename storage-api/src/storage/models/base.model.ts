@@ -8,6 +8,9 @@ export class StorageBaseAttributes {
   @Field()
   s3ObjectKey: string;
 
+  @Field({ nullable: true })
+  parentDirectoryUuid?: string;
+
   @Field()
   eTag: string;
 

@@ -28,7 +28,6 @@ onMounted(() => {
 </script>
 
 <template>
-  {{ files }}
   <div class="mdc-data-table storageList" ref="dataTableElement">
     <div class="mdc-data-table__table-container">
       <table class="mdc-data-table__table" aria-label="Dessert calories">

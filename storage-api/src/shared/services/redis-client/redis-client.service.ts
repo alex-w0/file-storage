@@ -114,7 +114,7 @@ export class RedisClientService {
 
     // Defines on which directory the file is located
     await this.#client.json.arrAppend(
-      `${bucketName}:level:root`,
+      `${bucketName}:level:${s3File.parentDirectoryUuid ?? 'root'}`,
       '$',
       s3File.uuid,
     );
