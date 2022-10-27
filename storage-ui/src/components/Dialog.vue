@@ -2,6 +2,7 @@
 import { ref, onMounted, type Ref } from "vue";
 
 import { MDCDialog } from "@material/dialog";
+import { MDCTextField } from "@material/textfield";
 
 const dialogElement: Ref<HTMLElement | null> = ref(null);
 
@@ -18,6 +19,9 @@ onMounted(() => {
   }
 
   const dialog = new MDCDialog(dialogElement.value);
+  const textField = new MDCTextField(
+    document.querySelector(".mdc-text-field")!
+  );
 });
 </script>
 
@@ -47,6 +51,22 @@ onMounted(() => {
         </div>
         <div class="mdc-dialog__content" id="my-dialog-content">
           <slot />
+          <label class="mdc-text-field mdc-text-field--outlined">
+            <span class="mdc-notched-outline">
+              <span class="mdc-notched-outline__leading"></span>
+              <span class="mdc-notched-outline__notch">
+                <span class="mdc-floating-label" id="my-label-id">Name</span>
+              </span>
+              <span class="mdc-notched-outline__trailing"></span>
+            </span>
+            <input
+              type="text"
+              id="directoryDialog__name"
+              name="directoryDialog__name"
+              class="mdc-text-field__input"
+              aria-labelledby="my-label-id"
+            />
+          </label>
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
           scelerisque metus dapibus, maximus massa pulvinar, commodo nunc.
           Quisque vitae luctus lectus, ut tempus ipsum. Sed suscipit gravida

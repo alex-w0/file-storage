@@ -78,10 +78,16 @@ onMounted(() => {
 @use "@material/banner/styles";
 @use "@material/dialog";
 
+@use "@material/floating-label/mdc-floating-label";
+@use "@material/line-ripple/mdc-line-ripple";
+@use "@material/notched-outline/mdc-notched-outline";
+@use "@material/textfield";
+
 @include linear-progress.core-styles;
 @include checkbox.core-styles;
 @include fab.core-styles;
 @include dialog.core-styles;
+@include textfield.core-styles;
 
 :host {
   --background: #fff;

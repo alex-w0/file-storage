@@ -167,5 +167,22 @@ onMounted(() => {
   <Dialog
     v-if="showCreateDirectoryDialog"
     dialog-title="Create a new directory"
-  ></Dialog>
+  >
+    <label class="mdc-text-field mdc-text-field--outlined">
+      <span class="mdc-notched-outline">
+        <span class="mdc-notched-outline__leading"></span>
+        <span class="mdc-notched-outline__notch">
+          <span class="mdc-floating-label" id="my-label-id">Name</span>
+        </span>
+        <span class="mdc-notched-outline__trailing"></span>
+      </span>
+      <input
+        type="text"
+        id="directoryDialog__name"
+        name="directoryDialog__name"
+        class="mdc-text-field__input"
+        aria-labelledby="my-label-id"
+      />
+    </label>
+  </Dialog>
 </template>

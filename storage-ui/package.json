@@ -24,6 +24,7 @@
     "@material/fab": "^14.0.0",
     "@material/icon-button": "^14.0.0",
     "@material/progress-indicator": "^14.0.0",
+    "@material/textfield": "^14.0.0",
     "@vue/apollo-composable": "^4.0.0-alpha.19",
     "graphql": "^16.6.0",
     "vue": "^3.2.37"
