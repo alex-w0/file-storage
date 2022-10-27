@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { initializeApolloClient } from "@/apollo-client";
 import { provideApolloClients } from "@vue/apollo-composable";
-import { onMounted, ref, watchEffect, type Ref } from "vue";
+import { watchEffect } from "vue";
 import StorageList from "../components/StorageList.vue";
-import { MDCBanner } from "@material/banner";
 import { configuration } from "@/composition-api/configuration";
+import Alert from "../components/Alert.vue";
+import { AlertState } from "@/shared/enums/AlertState";
 
 const props = defineProps({
   bucketName: {
@@ -13,7 +14,6 @@ const props = defineProps({
   },
 });
 
-const invalidSetupConfigurationElement: Ref<HTMLElement | null> = ref(null);
 const apolloClient = initializeApolloClient();
 
 provideApolloClients({
@@ -23,13 +23,6 @@ provideApolloClients({
 watchEffect(() => {
   configuration.bucketName = props.bucketName;
 });
-
-onMounted(() => {
-  if (invalidSetupConfigurationElement.value) {
-    const el = new MDCBanner(invalidSetupConfigurationElement.value);
-    el.open();
-  }
-});
 </script>
 
 <template>
@@ -37,26 +30,13 @@ onMounted(() => {
     rel="stylesheet"
     href="https://fonts.googleapis.com/icon?family=Material+Icons"
   />
-
-  <div v-if="props.bucketName" class="storageGallery">
-    <StorageList></StorageList>
-  </div>
-  <div
-    v-else
-    class="mdc-banner"
-    role="banner"
-    ref="invalidSetupConfigurationElement"
-  >
-    <div class="mdc-banner__content" role="alertdialog" aria-live="assertive">
-      <div class="mdc-banner__graphic-text-wrapper">
-        <div class="mdc-banner__graphic" role="img" alt="">
-          <i class="material-icons mdc-banner__icon">error</i>
-        </div>
-        <div class="mdc-banner__text">
-          The configuration of the widget was not configured properly.
-        </div>
-      </div>
+  <div class="font-sans">
+    <div v-if="props.bucketName" class="storageGallery">
+      <StorageList></StorageList>
     </div>
+    <Alert v-else :alert-type="AlertState.ERROR"
+      >The configuration of the widget was not configured properly.</Alert
+    >
   </div>
 </template>
 
@@ -88,6 +68,7 @@ onMounted(() => {
 @include fab.core-styles;
 @include dialog.core-styles;
 @include textfield.core-styles;
+@import "../style.css";
 
 :host {
   --background: #fff;
