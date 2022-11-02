@@ -3,9 +3,9 @@ import { ref, type Ref } from "vue";
 import StorageListItem from "./StorageListItem.vue";
 
 import { useFiles } from "@/composition-api/useFiles";
-import Dialog from "./Dialog.vue";
 import TableHeader from "./TableHeader.vue";
 import ButtonIcon from "./ButtonIcon.vue";
+import DialogCreateDirectory from "./dialogs/DialogCreateDirectory.vue";
 
 const showCreateDirectoryDialog: Ref<boolean> = ref(false);
 
@@ -52,9 +52,5 @@ loadFiles();
     </tbody>
   </table>
 
-  <Dialog
-    v-if="showCreateDirectoryDialog"
-    dialog-title="Create a new directory"
-  >
-  </Dialog>
+  <DialogCreateDirectory v-if="showCreateDirectoryDialog" />
 </template>

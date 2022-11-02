@@ -26,7 +26,7 @@ watchEffect(() => {
 </script>
 
 <template>
-  <div class="font-sans">
+  <div class="font-sans text-gray-dark">
     <div v-if="props.bucketName">
       <StorageList></StorageList>
     </div>
