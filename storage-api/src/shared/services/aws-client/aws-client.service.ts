@@ -3,6 +3,7 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  OnApplicationShutdown,
 } from '@nestjs/common';
 import {
   CompletedPart,
@@ -16,20 +17,20 @@ import {
   UploadPartCommandOutput,
 } from '@aws-sdk/client-s3';
 import { ConfigService } from '@nestjs/config';
-import { RedisClientService } from 'src/shared/services/redis-client/redis-client.service';
-import { StorageImage } from 'src/storage/models/storage-image.model';
+import { RedisClientService } from '@shared/services/redis-client/redis-client.service';
+import { StorageImage } from '@modules/storage/models/storage-image.model';
 import {
   CreateDirectoryInput,
   UploadStorageFileInput,
-} from 'src/storage/dto/new-storage-file.input';
-import { streamToBuffer } from 'src/shared/utils/stream-to-buffer';
-import { StorageFile } from 'src/storage/models/storage-file.model';
-import { StorageDirectory } from 'src/storage/models/storage-directory.model';
-import { StorageFileType } from 'src/shared/enums/storage-file-type';
-import { isStorageDirectory } from 'src/shared/utils/storage-file-assertions';
+} from '@modules/storage/dto/new-storage-file.input';
+import { streamToBuffer } from '@shared/utils/stream-to-buffer';
+import { StorageFile } from '@modules/storage/models/storage-file.model';
+import { StorageDirectory } from '@modules/storage/models/storage-directory.model';
+import { StorageFileType } from '@shared/enums/storage-file-type';
+import { isStorageDirectory } from '@shared/utils/storage-file-assertions';
 
 @Injectable()
-export class AWSClientService {
+export class AWSClientService implements OnApplicationShutdown {
   #client: S3Client;
 
   constructor(
@@ -52,6 +53,10 @@ export class AWSClientService {
         secretAccessKey: this.configService.get('S3_SECRET_ACCESS_KEY'),
       },
     });
+  }
+
+  onApplicationShutdown() {
+    this.#client.destroy();
   }
 
   get s3Client() {

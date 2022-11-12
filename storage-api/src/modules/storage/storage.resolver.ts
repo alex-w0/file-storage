@@ -7,8 +7,8 @@ import {
 } from './dto/new-storage-file.input';
 import { StorageImage } from './models/storage-image.model';
 
-import { AWSClientService } from 'src/shared/services/aws-client/aws-client.service';
-import { RedisClientService } from 'src/shared/services/redis-client/redis-client.service';
+import { AWSClientService } from '@shared/services/aws-client/aws-client.service';
+import { RedisClientService } from '@shared/services/redis-client/redis-client.service';
 import { StorageFile, StorageFileUnion } from './models/storage-file.model';
 import { StorageDirectory } from './models/storage-directory.model';
 import { StorageFilesOptions } from './dto/storage-file.input';
@@ -30,6 +30,7 @@ export class StorageResolver {
     })
     options: StorageFilesOptions,
   ): Promise<StorageFile[]> {
+    console.log('test');
     const files = await this.redisClientService.getFiles(
       bucketName,
       options?.directoryLevel,

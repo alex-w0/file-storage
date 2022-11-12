@@ -11,9 +11,12 @@ export class BucketExistsRule implements ValidatorConstraintInterface {
   constructor(private redisClientService: RedisClientService) {}
 
   async validate(value: string) {
+    console.log('validate');
     const bucketExists = await this.redisClientService.checkIfBucketExist(
       value,
     );
+
+    console.log('Result' + bucketExists);
 
     return bucketExists;
   }

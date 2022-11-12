@@ -2,17 +2,18 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  OnApplicationShutdown,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createClient, RedisClientType } from 'redis';
 import { randomUUID } from 'crypto';
-import { CustomTypeToRedisJSON } from 'src/shared/utils/json-converter';
-import { StoreFileArguments } from 'src/shared/models/redis-client.model';
-import { StorageFile } from 'src/storage/models/storage-file.model';
-import { isStorageDirectory } from 'src/shared/utils/storage-file-assertions';
+import { CustomTypeToRedisJSON } from '@shared/utils/json-converter';
+import { StoreFileArguments } from '@shared/models/redis-client.model';
+import { StorageFile } from '@modules/storage/models/storage-file.model';
+import { isStorageDirectory } from '@shared/utils/storage-file-assertions';
 
 @Injectable()
-export class RedisClientService {
+export class RedisClientService implements OnApplicationShutdown {
   #client: RedisClientType;
 
   constructor(private configService: ConfigService) {
@@ -31,6 +32,10 @@ export class RedisClientService {
 
       await this.#client.connect();
     })();
+  }
+
+  async onApplicationShutdown() {
+    await this.#client.quit();
   }
 
   #parseRedisJSONToStorageFile(data: any): StorageFile {

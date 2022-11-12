@@ -1,5 +1,5 @@
 import { createUnionType } from '@nestjs/graphql';
-import { isStorageImage } from 'src/shared/utils/storage-file-assertions';
+import { isStorageImage } from '@shared/utils/storage-file-assertions';
 import { StorageDirectory } from './storage-directory.model';
 import { StorageImage } from './storage-image.model';
 
