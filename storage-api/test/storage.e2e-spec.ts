@@ -4,29 +4,29 @@ import { print } from 'graphql';
 
 describe('StorageResolver (e2e)', () => {
   describe('Testing the endpoint files', () => {
-    it('Should return an error when an invalid bucketName was used', async () => {
-      const E2E_GET_ALL_FILES = gql`
-        query e2eGetAllFiles($bucketNameArguments: BucketNameArgs!) {
-          files(bucketNameArguments: $bucketNameArguments) {
-            ... on StorageImage {
-              uuid
-              s3ObjectKey
-              eTag
-              createdAt
-              url
-              updatedAt
-            }
+    const E2E_GET_ALL_FILES = gql`
+      query e2eGetAllFiles($bucketNameArguments: BucketNameArgs!) {
+        files(bucketNameArguments: $bucketNameArguments) {
+          ... on StorageImage {
+            uuid
+            s3ObjectKey
+            eTag
+            createdAt
+            url
+            updatedAt
+          }
 
-            ... on StorageDirectory {
-              uuid
-              metaData {
-                name
-              }
+          ... on StorageDirectory {
+            uuid
+            metaData {
+              name
             }
           }
         }
-      `;
+      }
+    `;
 
+    it('Should return an error when an invalid bucketName was used', async () => {
       const response = await request(global.__APP__.getHttpServer())
         .post('/graphql')
         .send({
