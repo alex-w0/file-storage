@@ -138,10 +138,14 @@ export class RedisClientService implements OnApplicationShutdown {
 
     // Create the directory root level key
     if (bucketCreated) {
-      await this.#client.json.set(`${bucketName}:level:root`, '$', []);
+      this.createBucketStructure(bucketName);
     }
 
     return bucketCreated;
+  }
+
+  async createBucketStructure(bucketName: string): Promise<void> {
+    await this.#client.json.set(`${bucketName}:level:root`, '$', []);
   }
 
   async checkIfFileKeyExist(
@@ -151,8 +155,32 @@ export class RedisClientService implements OnApplicationShutdown {
     return this.#client.sIsMember(`${bucketName}:s3Keys`, s3ObjectKey);
   }
 
+  async getAllS3Keys(bucketName: string) {
+    return this.#client.sMembers(`${bucketName}:s3Keys`);
+  }
+
   async checkIfBucketExist(bucketName: string): Promise<boolean> {
     return this.#client.sIsMember('validBucketNames', bucketName);
+  }
+
+  async deleteAllBucketKeys(bucketName: string) {
+    const s3Keys = [];
+    const iteratorParams = {
+      MATCH: `${bucketName}:*`,
+      COUNT: 100,
+    };
+
+    for await (const key of this.#client.scanIterator(iteratorParams)) {
+      s3Keys.push(key);
+    }
+
+    const batchDeleteOperations = [];
+
+    for (const s3Key of s3Keys) {
+      batchDeleteOperations.push(this.#client.unlink(s3Key));
+    }
+
+    await Promise.all(batchDeleteOperations);
   }
 }
 

@@ -10,6 +10,11 @@ declare global {
   // eslint-disable-next-line no-var
   var __APP__: INestApplication;
   // eslint-disable-next-line no-var
+  var __SERVICE__: {
+    REDIS_CLIENT: RedisClientService;
+    AWS_CLIENT: AWSClientService;
+  };
+  // eslint-disable-next-line no-var
   var __BUCKET_NAME__: string;
 }
 
@@ -28,15 +33,20 @@ module.exports = async () => {
 
   const awsClientService = await moduleFixture.resolve(AWSClientService);
   const redisClientService = await moduleFixture.resolve(RedisClientService);
-  console.log(process.env.JEST_WORKER_ID);
 
   const bucketName = 'storage-api-e2e-test';
 
   // Create the bucket if it does not exists
   if ((await redisClientService.checkIfBucketExist(bucketName)) === false) {
     await awsClientService.createS3Bucket(bucketName);
+  } else {
+    await redisClientService.createBucketStructure(bucketName);
   }
 
   global.__APP__ = app;
+  global.__SERVICE__ = {
+    REDIS_CLIENT: redisClientService,
+    AWS_CLIENT: awsClientService,
+  };
   global.__BUCKET_NAME__ = bucketName;
 };

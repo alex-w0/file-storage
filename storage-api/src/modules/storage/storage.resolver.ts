@@ -30,7 +30,6 @@ export class StorageResolver {
     })
     options: StorageFilesOptions,
   ): Promise<StorageFile[]> {
-    console.log('test');
     const files = await this.redisClientService.getFiles(
       bucketName,
       options?.directoryLevel,

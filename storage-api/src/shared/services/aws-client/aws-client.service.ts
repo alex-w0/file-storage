@@ -10,7 +10,10 @@ import {
   CompleteMultipartUploadCommand,
   CreateBucketCommand,
   CreateMultipartUploadCommand,
+  DeleteBucketCommand,
   DeleteObjectCommand,
+  DeleteObjectsCommand,
+  ObjectIdentifier,
   PutObjectCommand,
   S3Client,
   UploadPartCommand,
@@ -237,7 +240,7 @@ export class AWSClientService implements OnApplicationShutdown {
       );
     }
 
-    return await this.redisClient.storeFile(bucketName, {
+    return this.redisClient.storeFile(bucketName, {
       storageType: StorageFileType.Directory,
       eTag: putObjectCommandResponse.ETag,
       s3ObjectKey,
@@ -313,5 +316,34 @@ export class AWSClientService implements OnApplicationShutdown {
     }
 
     return bucketIsCreated;
+  }
+
+  async deleteAllS3Files(bucketName: string): Promise<void> {
+    const s3Keys = await this.redisClient.getAllS3Keys(bucketName);
+
+    if (s3Keys.length >= 1) {
+      const deleteObjectsCommand = new DeleteObjectsCommand({
+        Bucket: bucketName,
+        Delete: {
+          Objects: s3Keys.map((s3Key): ObjectIdentifier => {
+            return {
+              Key: s3Key,
+            };
+          }),
+        },
+      });
+
+      const deleteObjectsCommandResponse = await this.#client.send(
+        deleteObjectsCommand,
+      );
+
+      if (deleteObjectsCommandResponse.$metadata.httpStatusCode !== 200) {
+        throw new InternalServerErrorException(
+          `AWS S3 deleting the bucket failed!`,
+        );
+      }
+    }
+
+    await this.redisClient.deleteAllBucketKeys(bucketName);
   }
 }
